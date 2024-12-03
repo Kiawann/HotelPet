@@ -4,9 +4,10 @@ use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\KategoriHewanController;
 use App\Http\Controllers\Admin\DataHewanController;
 use App\Http\Controllers\Admin\DataPemilikController;
+use App\Http\Controllers\Admin\KategoriLayananController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
-
+use App\Models\KategoriLayanan;
 
 Route::get('/', function () {
     return view('welcome');
@@ -31,6 +32,7 @@ Route::middleware('auth')->group(function () {
         Route::resource('admin/dashboard', DashboardController::class);
         Route::resource('kategori_hewan', KategoriHewanController::class);
         Route::resource('data_hewan', DataHewanController::class);
+        Route::resource('kategori_layanan', KategoriLayananController::class);
     });
 
 
