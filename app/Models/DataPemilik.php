@@ -9,7 +9,7 @@ class DataPemilik extends Model
 {
     use HasFactory;
 
-    protected $table = 'data_pemilik'; // Pastikan nama tabelnya benar
+    protected $table = 'data_pemilik';
 
     protected $fillable = [
         'user_id',
