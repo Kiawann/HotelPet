@@ -6,13 +6,16 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 
-class KategoriHewan extends Model
+class KategoriLayanan extends Model
 {
     use HasFactory;
     
-    protected $table = 'kategori_hewan';
+    protected $table = 'kategori_layanan';
 
     protected $fillable = [
-        'nama_kategori',
+        'nama_layanan',
+        'deskripsi',
+        'foto',
+        'harga',
     ];
 }
