@@ -1,6 +1,8 @@
 <?php
 
 use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Admin\KategoriHewanController;
+use App\Http\Controllers\Admin\DataHewanController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 
@@ -20,7 +22,10 @@ Route::middleware('auth')->group(function () {
             return 'admin edited';
         });
         Route::resource('admin/dashboard', DashboardController::class);
+        Route::resource('kategori_hewan', KategoriHewanController::class);
+        Route::resource('data_hewan', DataHewanController::class);
     });
+
 
     Route::get('/dashboard', function () {
         return view('user.home');
