@@ -23,4 +23,9 @@ class DataHewan extends Model
     {
         return $this->belongsTo(KategoriHewan::class, 'kategori_hewan_id');
     }
+
+    public function laporanHewan()
+    {
+        return $this->hasMany(LaporanHewan::class, 'data_hewan_id');
+    }
 }

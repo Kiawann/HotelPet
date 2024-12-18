@@ -18,4 +18,6 @@ class DataPemilik extends Model
         'nomor_telp',
         'foto',
     ];
+
+    
 }
