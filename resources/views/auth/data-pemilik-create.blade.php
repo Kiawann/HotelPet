@@ -22,9 +22,8 @@
             </div>
         @endif
 
-        <form action="{{ route('register.store', ['step' => 2]) }}" method="POST" enctype="multipart/form-data">
+        <form action="{{ route('data-pemilik.store') }}" method="POST" enctype="multipart/form-data">
             @csrf
-
             <!-- Form Data Pemilik -->
             <div class="mb-3">
                 <label for="nama" class="form-label">Nama Pemilik</label>
@@ -39,12 +38,14 @@
                 @enderror
             </div>
 
+            
             <div class="mb-3">
                 <label for="jenis_kelamin" class="form-label">Jenis Kelamin</label>
                 <select 
                     class="form-select @error('jenis_kelamin') is-invalid @enderror" 
                     id="jenis_kelamin" 
                     name="jenis_kelamin">
+                    <option value="" disabled {{ old('jenis_kelamin') ? '' : 'selected' }}>Pilih Jenis Kelamin</option>
                     <option value="L" {{ old('jenis_kelamin') == 'L' ? 'selected' : '' }}>Laki-laki</option>
                     <option value="P" {{ old('jenis_kelamin') == 'P' ? 'selected' : '' }}>Perempuan</option>
                 </select>
@@ -78,7 +79,7 @@
                 @enderror
             </div>
 
-            <button type="submit" class="btn btn-primary">Selesai dan Login</button>
+            <button type="submit" class="btn btn-primary">Selesai</button>
         </form>
     </div>
 

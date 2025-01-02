@@ -3,10 +3,13 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use App\Models\DataPemilik;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use App\Models\DataPemilik;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\VerifyEmail;
+use Illuminate\Support\Facades\Password;
 
 class AuthController extends Controller
 {
@@ -16,125 +19,79 @@ class AuthController extends Controller
     }
 
     public function loginStore(Request $request)
-    {
-        $request->validate([
-            'email' => 'required|email',
-            'password' => 'required',
-        ]);
+{
+    $request->validate([
+        'email' => 'required|email',
+        'password' => 'required',
+    ]);
 
-        $credentials = $request->only('email', 'password');
+    $user = User::where('email', $request->email)->first();
 
-        if (Auth::attempt($credentials, $request->remember)) {
-            $request->session()->regenerate();
-
-            if (Auth::user()->role == 'admin') {
-                return redirect('admin/dashboard');
-            }
-
-            return redirect()->intended('/dashboard');
-        }
-
+    // Cek apakah user ada
+    if (!$user) {
         return back()->withErrors([
-            'email' => 'The provided credentials do not match our records.',
-        ]);
+            'email' => 'Akun tidak ditemukan.',
+        ])->withInput($request->only('email'));
     }
 
-    public function register(Request $request, $step = 1)
-    {
-        if ($step == 1) {
-            return view('auth.register'); // View untuk User
-        } elseif ($step == 2) {
-            return view('auth.data-pemilik-create'); // View untuk Data Pemilik
-        }
-    
-        abort(404); // Jika langkah tidak valid
+    // Cek apakah email sudah diverifikasi
+    if (!$user->hasVerifiedEmail()) {
+        return back()->withErrors([
+            'email' => 'Akun Anda belum diverifikasi. Silakan cek email Anda untuk verifikasi.',
+        ])->withInput($request->only('email'));
     }
-    
 
-    public function registerStore(Request $request, $step = 1)
-    {
-        if ($step == 1) {
-            // Validasi input User dengan pesan khusus
-            $request->validate([
-                'name' => 'required|string|max:255',
-                'email' => 'required|email|unique:users,email',
-                'password' => 'required|confirmed|min:8',
-            ], [
-                'name.required' => 'Nama wajib diisi.',
-                'name.string' => 'Nama harus berupa teks.',
-                'name.max' => 'Nama tidak boleh lebih dari 255 karakter.',
-                'email.required' => 'Email wajib diisi.',
-                'email.email' => 'Format email tidak valid.',
-                'email.unique' => 'Email sudah terdaftar.',
-                'password.required' => 'Password wajib diisi.',
-                'password.confirmed' => 'Konfirmasi password tidak sesuai.',
-                'password.min' => 'Password harus terdiri dari minimal 8 karakter.',
-            ]);
-    
-            // Simpan data sementara di session
-            $request->session()->put('user_data', [
-                'name' => $request->name,
-                'email' => $request->email,
-                'password' => Hash::make($request->password),
-            ]);
-    
-            return redirect()->route('register', ['step' => 2]);
+    // Cek kredensial login
+    if (Auth::attempt($request->only('email', 'password'), $request->remember)) {
+        $request->session()->regenerate();
+
+        // Redirect berdasarkan role
+        $role = Auth::user()->role;
+        if ($role == 'admin') {
+            return redirect('admin/dashboard');
+        } elseif ($role == 'perawat') {
+            return redirect('perawat/dashboard');
         }
-    
-        if ($step == 2) {
-            // Validasi input Data Pemilik dengan pesan khusus
-            $request->validate([
-                'nama' => 'required|string|max:255',
-                'jenis_kelamin' => 'required|in:L,P',
-                'nomor_telp' => 'required|string',
-                'foto' => 'nullable|image|max:2048',
-            ], [
-                'nama.required' => 'Nama pemilik wajib diisi.',
-                'nama.string' => 'Nama pemilik harus berupa teks.',
-                'nama.max' => 'Nama pemilik tidak boleh lebih dari 255 karakter.',
-                'jenis_kelamin.required' => 'Jenis kelamin wajib dipilih.',
-                'jenis_kelamin.in' => 'Pilihan jenis kelamin tidak valid.',
-                'nomor_telp.required' => 'Nomor telepon wajib diisi.',
-                'nomor_telp.string' => 'Nomor telepon harus berupa teks.',
-                'foto.image' => 'Foto harus berupa file gambar.',
-                'foto.max' => 'Ukuran foto tidak boleh lebih dari 2MB.',
-            ]);
-    
-            // Ambil data User dari session
-            $userData = $request->session()->get('user_data');
-            if (!$userData) {
-                return redirect()->route('register', ['step' => 1])
-                    ->withErrors(['message' => 'Data pengguna belum lengkap.']);
-            }
-    
-            // Simpan data User ke database
-            $user = User::create($userData);
-    
-            // Simpan data Pemilik ke database
-            $fotoPath = $request->file('foto') 
-                ? $request->file('foto')->store('foto_pemilik', 'public') 
-                : null;
-    
-            DataPemilik::create([
-                'user_id' => $user->id,
-                'nama' => $request->nama,
-                'jenis_kelamin' => $request->jenis_kelamin,
-                'nomor_telp' => $request->nomor_telp,
-                'foto' => $fotoPath,
-            ]);
-    
-            // Hapus data dari session
-            $request->session()->forget('user_data');
-    
-            // Login otomatis
-            Auth::login($user);
-    
-            return redirect('/dashboard');
-        }
-    
-        abort(404);
+
+        return redirect()->intended('/dashboard');
     }
-    
+
+    return back()->withErrors([
+        'password' => 'Password yang Anda masukkan salah.',
+    ])->withInput($request->only('email'));
+}
+       
+
+    public function register(Request $request)
+    {
+        return view('auth.register'); // Tampilan untuk form pendaftaran
+    }
+
+    public function registerStore(Request $request)
+{
+    // Validasi input User
+    $request->validate([
+        'name' => 'required|string|max:255',
+        'email' => 'required|email|unique:users,email',
+        'password' => 'required|confirmed|min:8',
+    ]);
+
+    // Simpan data User
+    $user = User::create([
+        'name' => $request->name,
+        'email' => $request->email,
+        'password' => Hash::make($request->password),
+        'email_verified_at' => null,  // Belum diverifikasi
+    ]);
+
+    // Kirim email verifikasi (menggunakan notifikasi verifikasi bawaan Laravel)
+    $user->sendEmailVerificationNotification();
+
+    // Redirect ke halaman login setelah pendaftaran
+    return redirect('/login')->with('status', 'Akun Sudah Di Buat,Silakan cek email Anda untuk memverifikasi akun.');
+}
+
+
     public function logout(Request $request)
     {
         Auth::logout();
@@ -144,4 +101,90 @@ class AuthController extends Controller
 
         return redirect('/login');
     }
+
+    public function verifyEmail($id)
+    {
+        $user = User::find($id); // Mencari user berdasarkan ID
+
+        if (!$user || $user->email_verified_at) {
+            abort(404); // Jika user tidak ditemukan atau sudah diverifikasi
+        }
+
+        // Verifikasi email
+        $user->email_verified_at = now();
+        $user->save();
+
+        // Login otomatis setelah email diverifikasi
+        Auth::login($user); // Pastikan yang diteruskan adalah objek User
+
+        // Setelah login, periksa apakah Data Pemilik sudah ada
+        if (is_null($user->dataPemilik)) {
+            return redirect()->route('data-pemilik.create'); // Arahkan ke halaman pengisian Data Pemilik
+        }
+
+        return redirect('/dashboard')->with('status', 'Email berhasil diverifikasi. Anda telah login.');
+    }
+
+    // Menampilkan form pengisian Data Pemilik
+    public function showDataPemilikForm()
+    {
+        return view('auth.data-pemilik-create'); // Tampilan form Data Pemilik
+    }
+
+    public function showForgetPasswordForm()
+    {
+        return view('auth.forget-password'); // Form untuk memasukkan email
+    }
+
+    public function sendResetLink(Request $request)
+{
+    $request->validate([
+        'email' => 'required|email|exists:users,email',
+    ]);
+
+    $status = Password::sendResetLink(
+        $request->only('email')
+    );
+
+    if ($status === Password::RESET_LINK_SENT) {
+        return redirect('/login')->with('status', 'Link reset password telah dikirim ke email Anda.');
+    }
+
+    return back()->withErrors(['email' => 'Gagal mengirim link reset password.']);
 }
+
+
+    public function showResetPasswordForm(Request $request,$token)
+    {
+        return view('auth.reset-password', [
+            'token' => $token,
+            'email' => $request->email, // Email yang dikirim via URL
+        ]);
+    }
+
+    public function resetPassword(Request $request)
+    {
+        $request->validate([
+            'email' => 'required|email|exists:users,email',
+            'password' => 'required|confirmed|min:8',
+            'token' => 'required',
+        ]);
+
+        $status = Password::reset(
+            $request->only('email', 'password', 'password_confirmation', 'token'),
+            function ($user, $password) {
+                $user->forceFill([
+                    'password' => Hash::make($password),
+                ])->save();
+            }
+        );
+
+        return $status === Password::PASSWORD_RESET
+            ? redirect('/login')->with('status', 'Password berhasil direset. Silakan login.')
+            : back()->withErrors(['email' => 'Gagal mereset password.']);
+    }
+
+    
+}
+
+
