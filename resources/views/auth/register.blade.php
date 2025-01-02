@@ -1,4 +1,3 @@
-<!-- resources/views/auth/register.blade.php -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -10,6 +9,13 @@
 <body>
     <div class="container mt-5">
         <h2>Form Registrasi</h2>
+
+        <!-- Pesan Sukses -->
+        @if (session('status'))
+            <div class="alert alert-success">
+                {{ session('status') }}
+            </div>
+        @endif
 
         <!-- Pesan Error Global -->
         @if ($errors->any())
@@ -33,7 +39,7 @@
                     id="name" 
                     name="name" 
                     value="{{ old('name') }}" 
-                    >
+                >
                 @error('name')
                     <div class="invalid-feedback">{{ $message }}</div>
                 @enderror
@@ -47,7 +53,7 @@
                     id="email" 
                     name="email" 
                     value="{{ old('email') }}" 
-                    >
+                >
                 @error('email')
                     <div class="invalid-feedback">{{ $message }}</div>
                 @enderror
@@ -60,7 +66,7 @@
                     class="form-control @error('password') is-invalid @enderror" 
                     id="password" 
                     name="password" 
-                    >
+                >
                 @error('password')
                     <div class="invalid-feedback">{{ $message }}</div>
                 @enderror
@@ -73,13 +79,14 @@
                     class="form-control @error('password_confirmation') is-invalid @enderror" 
                     id="password_confirmation" 
                     name="password_confirmation" 
-                    >
+                >
                 @error('password_confirmation')
                     <div class="invalid-feedback">{{ $message }}</div>
                 @enderror
             </div>
 
-            <button type="submit" class="btn btn-primary">Lanjutkan ke Form Data Pemilik</button>
+            <button type="submit" class="btn btn-primary">Submit</button>
+            <a href="{{ route('login') }}" class="btn btn-primary btn-lg">Kembali</a>
         </form>
     </div>
 

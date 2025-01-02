@@ -16,12 +16,35 @@
                 <div class="card-body">
                     <label>Login</label>
                     <hr>
+
+                    <!-- Menampilkan Pesan Status -->
+                    @if (session('status'))
+                        <div class="alert alert-success">
+                            {{ session('status') }}
+                        </div>
+                    @endif
+
+                    <!-- Menampilkan Pesan Error -->
+                    @if (session('error'))
+                        <div class="alert alert-danger">
+                            {{ session('error') }}
+                        </div>
+                    @endif
+
                     <form action="{{ route('login.store') }}" method="POST">
                         @csrf
                         <div class="form-group mb-2">
-                            <label>Email</label>
-                            <input type="email" name="email" class="form-control {{ $errors->has('email') ? 'is-invalid' : '' }}" id="email" placeholder="Email">
-                            @error ('email')
+                            <label for="email">Email</label>
+                            <input 
+                                type="email" 
+                                name="email" 
+                                class="form-control {{ $errors->has('email') ? 'is-invalid' : '' }}" 
+                                id="email" 
+                                placeholder="Email"
+                                value="{{ old('email') }}" 
+                                required
+                            >
+                            @error('email')
                                 <div class="invalid-feedback">
                                     {{ $message }}
                                 </div>
@@ -29,9 +52,16 @@
                         </div>
 
                         <div class="form-group mb-2">
-                            <label>Password</label>
-                            <input type="password" name="password" class="form-control {{ $errors->has('password') ? 'is-invalid' : '' }}" id="password" placeholder="Password">
-                            @error ('password')
+                            <label for="password">Password</label>
+                            <input 
+                                type="password" 
+                                name="password" 
+                                class="form-control {{ $errors->has('password') ? 'is-invalid' : '' }}" 
+                                id="password" 
+                                placeholder="Password"
+                                required
+                            >
+                            @error('password')
                                 <div class="invalid-feedback">
                                     {{ $message }}
                                 </div>
@@ -45,7 +75,12 @@
 
             <div class="text-center" style="margin-top: 15px">
                 <a href="{{ route('register') }}">Register</a>
+                <a href="{{ route('password.request') }}" class="btn btn-link">Lupa Password?</a>
             </div>
         </div>
     </div>
 </div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
