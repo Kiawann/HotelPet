@@ -50,7 +50,9 @@ class AuthController extends Controller
         if ($role == 'admin') {
             return redirect('admin/dashboard');
         } elseif ($role == 'perawat') {
-            return redirect('perawat/dashboard');
+            return redirect('perawat-dashboard');
+        } elseif ($role == 'kasir') { // Tambahan untuk role kasir
+            return redirect('kasir-dashboard');
         }
 
         return redirect()->intended('/dashboard');
@@ -60,6 +62,7 @@ class AuthController extends Controller
         'password' => 'Password yang Anda masukkan salah.',
     ])->withInput($request->only('email'));
 }
+
        
 
     public function register(Request $request)

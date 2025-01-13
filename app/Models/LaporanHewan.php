@@ -22,6 +22,7 @@ class LaporanHewan extends Model
         'keterangan',
         'tanggal_laporan',
         'foto',
+        'video',
     ];
 
     /**
@@ -29,7 +30,7 @@ class LaporanHewan extends Model
      */
     public function reservasiHotel()
     {
-        return $this->belongsTo(ReservasiHotel::class, 'reservasi_hotel_id');
+        return $this->belongsTo(ReservasiHotel::class, 'reservasi_hotel_id','id');
     }
 
     /**
@@ -37,7 +38,7 @@ class LaporanHewan extends Model
      */
     public function dataHewan()
     {
-        return $this->belongsTo(DataHewan::class, 'data_hewan_id');
+        return $this->belongsTo(DataHewan::class, 'data_hewan_id','id');
     }
 
     /**
@@ -47,4 +48,10 @@ class LaporanHewan extends Model
     {
         return $this->belongsTo(Room::class, 'room_id');
     }
+
+    public function rincianReservasiHotel()
+{
+    return $this->belongsTo(RincianReservasiHotel::class, 'reservasi_hotel_id', 'id');
+}
+
 }
