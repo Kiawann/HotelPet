@@ -4,6 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>Login</title>
 </head>
@@ -53,14 +54,21 @@
 
                         <div class="form-group mb-2">
                             <label for="password">Password</label>
-                            <input 
-                                type="password" 
-                                name="password" 
-                                class="form-control {{ $errors->has('password') ? 'is-invalid' : '' }}" 
-                                id="password" 
-                                placeholder="Password"
-                                required
-                            >
+                            <div class="position-relative">
+                                <input 
+                                    type="password" 
+                                    name="password" 
+                                    class="form-control {{ $errors->has('password') ? 'is-invalid' : '' }}" 
+                                    id="password" 
+                                    placeholder="Password"
+                                    required
+                                >
+                                <i 
+                                    class="bi bi-eye position-absolute top-50 translate-middle-y end-0 me-3" 
+                                    id="togglePassword" 
+                                    style="cursor: pointer;">
+                                </i>
+                            </div>
                             @error('password')
                                 <div class="invalid-feedback">
                                     {{ $message }}
@@ -82,5 +90,19 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    const togglePassword = document.querySelector('#togglePassword');
+    const passwordField = document.querySelector('#password');
+
+    togglePassword.addEventListener('click', function () {
+        // Toggle the type attribute
+        const type = passwordField.getAttribute('type') === 'password' ? 'text' : 'password';
+        passwordField.setAttribute('type', type);
+
+        // Toggle the icon class
+        this.classList.toggle('bi-eye');
+        this.classList.toggle('bi-eye-slash');
+    });
+</script>
 </body>
 </html>
