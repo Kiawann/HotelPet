@@ -96,9 +96,9 @@ Route::put('reservasi-hotel-{id}-checkin', [KasirReservasiHotelController::class
         Route::get('/kasir/transaksi/struk/{reservasi_hotel_id}', [KasirTransaksiController::class, 'showStruk'])
         ->name('transaksi-struk');
 
-
-
-
+        Route::get('riwayat-reservasi', [KasirReservasiHotelController::class, 'riwayatReservasi'])->name('riwayat.reservasi');
+        Route::get('detail-riwayat-reservasi/{id}', [KasirReservasiHotelController::class, 'detailRiwayat'])->name('riwayat.reservasi-detail');
+        Route::get('reservasi-hotel/{id}', [KasirReservasiHotelController::class, 'getDetails']);
 
     });
     

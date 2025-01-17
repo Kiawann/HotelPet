@@ -29,6 +29,8 @@ class Transaksi extends Model
         'Subtotal',
         'status_pembayaran',
         'Foto_Transfer',
+        'Dibayar',
+        'Kembalian',
     ];
 
     /**
@@ -43,9 +45,10 @@ class Transaksi extends Model
      * Get the related ReservasiHotel model.
      */
     public function reservasiHotel()
-    {
-        return $this->belongsTo(ReservasiHotel::class);
-    }
+{
+    return $this->belongsTo(ReservasiHotel::class, 'reservasi_hotel_id', 'id');
+}
+
 
     /**
      * Get the related ReservasiLayanan model.
