@@ -119,7 +119,17 @@
         <p>Terima kasih telah mempercayakan hotel kami!</p>
         <p>Semoga pelayanan kami memuaskan Anda!</p>
 
-        <button onclick="window.print()">Cetak Struk</button>
+      
     </div>
+    
+    <script>
+        // Fungsi untuk mencetak struk
+        window.onload = function() {
+            window.print(); // Cetak otomatis saat halaman dimuat
+            setTimeout(function() {
+                window.location.href = "{{ route('kasir-reservasi-hotel.show', ['kasir_reservasi_hotel' => $transaksi->reservasiHotel->id]) }}"; // Ganti dengan route yang sesuai
+            }, 1000); // Setelah 1 detik, redirect ke halaman daftar reservasi
+        };
+    </script>
 </body>
 </html>
