@@ -100,9 +100,9 @@ class KasirTransaksiController extends Controller
     }
 
     // Redirect ke index dengan menyertakan parameter filter yang ada
-    return redirect()
-        ->route('kasir-reservasi-hotel.rincian', $redirectParams)
-        ->with('success', 'Pembayaran berhasil.');
+    return redirect()->route('transaksi-struk', ['reservasi_hotel_id' => $transaksi->reservasi_hotel_id])
+    ->with('success', 'Pembayaran berhasil.');
+
     }
  
     

@@ -14,89 +14,83 @@ class KasirReservasiHotelController extends Controller
      * Display a listing of the resource.
      */
     public function index(Request $request)
-    {
-        // Get today's date at midnight (start of day)
-        $today = now()->startOfDay()->format('Y-m-d H:i:s');
+{
+    // Get today's date at midnight (start of day)
+    $today = now()->startOfDay()->format('Y-m-d H:i:s');
 
-        $query = ReservasiHotel::with([
-            'rincianReservasiHotel.dataHewan',
-            'rincianReservasiHotel.room',
-            'transaksi'
-        ])->where('status', '!=', 'done');
+    $query = ReservasiHotel::with([
+        'rincianReservasiHotel.dataHewan',
+        'rincianReservasiHotel.room',
+        'transaksi'
+    ])->where('status', '!=', 'done');
 
-        // Apply status filter and corresponding date filter
-        if ($request->filled('status')) {
-            $query->where('status', $request->status);
+    // Apply status filter and corresponding date filter
+    if ($request->filled('status')) {
+        $query->where('status', $request->status);
 
-            // If status is checkout, use tanggal_checkout for date filtering
-            if ($request->status === 'check out' && $request->filled('date_filter')) {
-                if ($request->date_filter === 'today') {
-                    $query->whereDate('tanggal_checkout', $today);
-                } elseif ($request->date_filter === 'yesterday') {
-                    $query->whereDate('tanggal_checkout', now()->subDay()->format('Y-m-d'));
-                } elseif ($request->date_filter === 'all_dates') {
-                    $query->whereRaw('tanggal_checkout >= ?', [$today]);
-                }
-            }
-            // For check in status
-            elseif ($request->status === 'check in' && $request->filled('date_filter')) {
-                if ($request->date_filter === 'today') {
-                    $query->whereDate('tanggal_checkin', now()->format('Y-m-d'));
-                } elseif ($request->date_filter === 'yesterday') {
-                    $query->whereDate('tanggal_checkin', now()->subDay()->format('Y-m-d'));
-                } elseif ($request->date_filter === 'all_dates') {
-                    $query->whereRaw('DATE(tanggal_checkin) >= DATE(?)', [$today]);
-                }
-            }
-            // For other statuses
-            elseif ($request->filled('date_filter')) {
-                if ($request->date_filter === 'today') {
-                    $query->whereDate('tanggal_checkin', now()->format('Y-m-d'));
-                } elseif ($request->date_filter === 'yesterday') {
-                    $query->whereDate('tanggal_checkin', now()->subDay()->format('Y-m-d'));
-                } elseif ($request->date_filter === 'all_dates') {
-                    $query->whereRaw('DATE(tanggal_checkin) >= DATE(?)', [$today]);
-                }
-            }
-        }
-        // If no status is selected but date filter is applied
-        elseif ($request->filled('date_filter')) {
+        if ($request->status === 'check out' && $request->filled('date_filter')) {
             if ($request->date_filter === 'today') {
-                $query->where(function ($q) {
-                    $today = now()->format('Y-m-d');
-                    $q->whereDate('tanggal_checkin', $today)
-                        ->orWhere(function ($q2) use ($today) {
-                            $q2->where('status', 'check out')
-                                ->whereDate('tanggal_checkout', $today);
-                        });
-                });
+                $query->whereDate('tanggal_checkout', $today);
             } elseif ($request->date_filter === 'yesterday') {
-                $query->where(function ($q) {
-                    $yesterday = now()->subDay()->format('Y-m-d');
-                    $q->whereDate('tanggal_checkin', $yesterday)
-                        ->orWhere(function ($q2) use ($yesterday) {
-                            $q2->where('status', 'check out')
-                                ->whereDate('tanggal_checkout', $yesterday);
-                        });
-                });
+                $query->whereDate('tanggal_checkout', now()->subDay()->format('Y-m-d'));
             } elseif ($request->date_filter === 'all_dates') {
-                $query->where(function ($q) use ($today) {
-                    $q->where(function ($q1) use ($today) {
-                        $q1->where('status', '!=', 'check out')
-                            ->whereRaw('DATE(tanggal_checkin) >= DATE(?)', [$today]);
-                    })->orWhere(function ($q2) use ($today) {
-                        $q2->where('status', 'check out')
-                            ->whereRaw('DATE(tanggal_checkout) >= DATE(?)', [$today]);
-                    });
-                });
+                $query->whereRaw('tanggal_checkout >= ?', [$today]);
+            }
+        } elseif ($request->status === 'check in' && $request->filled('date_filter')) {
+            if ($request->date_filter === 'today') {
+                $query->whereDate('tanggal_checkin', now()->format('Y-m-d'));
+            } elseif ($request->date_filter === 'yesterday') {
+                $query->whereDate('tanggal_checkin', now()->subDay()->format('Y-m-d'));
+            } elseif ($request->date_filter === 'all_dates') {
+                $query->whereRaw('DATE(tanggal_checkin) >= DATE(?)', [$today]);
+            }
+        } elseif ($request->filled('date_filter')) {
+            if ($request->date_filter === 'today') {
+                $query->whereDate('tanggal_checkin', now()->format('Y-m-d'));
+            } elseif ($request->date_filter === 'yesterday') {
+                $query->whereDate('tanggal_checkin', now()->subDay()->format('Y-m-d'));
+            } elseif ($request->date_filter === 'all_dates') {
+                $query->whereRaw('DATE(tanggal_checkin) >= DATE(?)', [$today]);
             }
         }
-
-        // Get the filtered results
-        $reservasiHotels = $query->get();
-
-        return view('kasir.reservasi_hotel.index', compact('reservasiHotels'));
+    } elseif ($request->filled('date_filter')) {
+        if ($request->date_filter === 'today') {
+            $query->where(function ($q) {
+                $today = now()->format('Y-m-d');
+                $q->whereDate('tanggal_checkin', $today)
+                    ->orWhere(function ($q2) use ($today) {
+                        $q2->where('status', 'check out')
+                            ->whereDate('tanggal_checkout', $today);
+                    });
+            });
+        } elseif ($request->date_filter === 'yesterday') {
+            $query->where(function ($q) {
+                $yesterday = now()->subDay()->format('Y-m-d');
+                $q->whereDate('tanggal_checkin', $yesterday)
+                    ->orWhere(function ($q2) use ($yesterday) {
+                        $q2->where('status', 'check out')
+                            ->whereDate('tanggal_checkout', $yesterday);
+                    });
+            });
+        } elseif ($request->date_filter === 'all_dates') {
+            $query->where(function ($q) use ($today) {
+                $q->where(function ($q1) use ($today) {
+                    $q1->where('status', '!=', 'check out')
+                        ->whereRaw('DATE(tanggal_checkin) >= DATE(?)', [$today]);
+                })->orWhere(function ($q2) use ($today) {
+                    $q2->where('status', 'check out')
+                        ->whereRaw('DATE(tanggal_checkout) >= DATE(?)', [$today]);
+                });
+            });
+        }
     }
+
+    // Get the filtered results
+    $reservasiHotels = $query->get();
+
+    return view('kasir.reservasi_hotel.index', compact('reservasiHotels'));
+}
+
 
     // public function getDetails($id)
     // {
@@ -145,11 +139,53 @@ class KasirReservasiHotelController extends Controller
             ReservasiHotel::where('id', $id)->update(['status' => 'done']);
         }
 
-        return redirect()->route('reservasi-hotel.show', $id)
+        return redirect()->route('reservasi-hotel.index', $id)
             ->with('success', 'Status berhasil diperbarui');
     }
 
+    public function updateStatusReservasi(Request $request, $reservasiHotelId) {
+        // Ambil data reservasiHotel
+        $reservasiHotel = ReservasiHotel::findOrFail($reservasiHotelId);
+        
+        // Ambil rincian yang dipilih oleh user
+        $rincianIds = $request->input('rincian_ids', []);
+        
+        if (!empty($rincianIds)) {
+            // Update status rincian_reservasi_hotel yang dipilih menjadi 'sudah di ambil'
+            RincianReservasiHotel::whereIn('id', $rincianIds)
+                ->update(['status' => 'sudah di ambil']);
+        }
+        
+        // Hitung jumlah total rincian untuk reservasi ini
+        $totalRincian = RincianReservasiHotel::where('reservasi_hotel_id', $reservasiHotelId)->count();
+        
+        // Hitung jumlah rincian yang sudah diambil
+        $totalSudahDiambil = RincianReservasiHotel::where('reservasi_hotel_id', $reservasiHotelId)
+            ->where('status', 'sudah di ambil')
+            ->count();
+        
+        // Jika jumlah rincian yang sudah diambil sama dengan total rincian
+        // artinya semua rincian sudah diambil
+        if ($totalRincian == $totalSudahDiambil) {
+            $reservasiHotel->update(['status' => 'done']);
+        }
+    
+       // Ambil status dan date_filter dari request
+       $status = $request->input('status');
+       $dateFilter = $request->input('date_filter');
+        
+        // Redirect kembali ke halaman dengan mempertahankan filter yang ada
+        return redirect()->route('kasir-reservasi-hotel.index', [
+            'status' => $status,
+            'date_filter' => $dateFilter
+        ])->with('success', 'Status berhasil diperbarui.');
+    }
+    
 
+
+
+
+ 
     public function bulkCancel(Request $request)
     {
         // Validasi input
