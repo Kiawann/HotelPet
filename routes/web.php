@@ -99,6 +99,9 @@ Route::put('reservasi-hotel-{id}-checkin', [KasirReservasiHotelController::class
         Route::get('riwayat-reservasi', [KasirReservasiHotelController::class, 'riwayatReservasi'])->name('riwayat.reservasi');
         Route::get('detail-riwayat-reservasi/{id}', [KasirReservasiHotelController::class, 'detailRiwayat'])->name('riwayat.reservasi-detail');
         Route::get('reservasi-hotel/{id}', [KasirReservasiHotelController::class, 'getDetails']);
+        Route::put('reservasi/{reservasiHotel}/update-status', [KasirReservasiHotelController::class, 'updateStatusReservasi'])
+    ->name('update-status-rincian-reservasi');
+
 
     });
     
