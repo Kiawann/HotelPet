@@ -41,9 +41,7 @@
                     <table class="table table-bordered table-striped">
                         <thead class="thead-light">
                             <tr>
-                                <th>
-                                    <input type="checkbox" id="select-all" {{ $reservasiHotel->rincianReservasiHotel->contains('status', 'sudah di ambil') ? 'disabled' : '' }}>
-                                </th>
+                                
                                 <th>Nama Ruangan</th>
                                 <th>Harga per Malam</th>
                                 <th>Nama Hewan</th>
@@ -66,14 +64,7 @@
                                     $totalHarga += $subtotal; // Tambahkan subtotal ke total harga
                                 @endphp
                                 <tr>
-                                    <td>
-                                        @foreach($rincianGroup as $rincian)
-                                            <input type="checkbox" name="rincian_ids[]" class="member-checkbox" 
-                                                   value="{{ $rincian->id }}" 
-                                                   {{ $rincian->status == 'sudah di ambil' ? 'checked disabled' : '' }}>
-                                            <br>
-                                        @endforeach
-                                    </td>
+                                   
                                     <td>{{ $room->nama_ruangan ?? 'Room tidak tersedia' }}</td>
                                     <td>Rp {{ number_format($room->category_hotel->harga, 0, ',', '.') }}</td>
                                     <td>
@@ -117,10 +108,10 @@
                     </table>
 
                     <div class="text-right">
-                        <button type="submit" class="btn btn-success">Update Status ke Sudah Diambil</button>
+                       
 
                         @if($reservasiHotel->transaksi) <!-- Cek apakah sudah ada transaksi -->
-                            <a href="{{ route('transaksi-struk', ['reservasi_hotel_id' => $reservasiHotel->id]) }}" class="btn btn-info btn-sm">
+                            <a href="{{ route('transaksi-struk', ['reservasi_hotel_id' => $reservasiHotel->id]) }}" class="btn btn-inffo btn-sm">
                                 <i class="fas fa-receipt"></i> Lihat Struk
                             </a>
                         @else
@@ -147,14 +138,6 @@
 </div>
 
 <script>
-   document.getElementById('select-all').addEventListener('change', function() {
-    const isChecked = this.checked;
-    document.querySelectorAll('.member-checkbox').forEach(checkbox => {
-        // Hanya aktifkan checkbox jika statusnya tidak 'sudah diambil'
-        if (!checkbox.hasAttribute('disabled')) {
-            checkbox.checked = isChecked;
-        }
-    });
-});
+  //
 </script>
 @endsection
