@@ -108,16 +108,19 @@
                     </table>
 
                     <div class="text-right">
-                       
-
                         @if($reservasiHotel->transaksi) <!-- Cek apakah sudah ada transaksi -->
-                            <a href="{{ route('transaksi-struk', ['reservasi_hotel_id' => $reservasiHotel->id]) }}" class="btn btn-inffo btn-sm">
-                                <i class="fas fa-receipt"></i> Lihat Struk
+                            <a href="{{ route('transaksi-struk', ['reservasi_hotel_id' => $reservasiHotel->id]) }}" 
+                               class="btn btn-info btn-sm d-inline-flex align-items-center">
+                                <i class="fas fa-receipt me-2"></i> Lihat Struk
                             </a>
                         @else
-                        <a href="{{ route('transaksi-create', $reservasiHotel->id) }}?status={{ request('status') }}&date_filter={{ request('date_filter') }}" class="btn btn-primary btn-sm">Pembayaran</a>
+                            <a href="{{ route('transaksi-create', $reservasiHotel->id) }}?status={{ request('status') }}&date_filter={{ request('date_filter') }}" 
+                               class="btn btn-primary btn-sm d-inline-flex align-items-center">
+                                <i class="fas fa-credit-card me-2"></i> Pembayaran
+                            </a>
                         @endif
                     </div>
+                    
                 </form>
             </div>
 

@@ -5,7 +5,10 @@
 @section('content')
 <div class="container mt-5">
     <h1 class="mb-4">Daftar Laporan Hewan</h1>
-    <a href="{{ route('perawat-reservasi-hotel.index') }}" class="btn btn-primary mb-3">Kembali</a>
+    <a href="{{ route('perawat-reservasi-hotel.index', [
+    'status' => request('status'),
+    'date_filter' => request('date_filter')
+]) }}" class="btn btn-primary mb-3">Kembali</a>
 
     @if(session('success'))
         <div class="alert alert-success">{{ session('success') }}</div>
@@ -22,10 +25,10 @@
             </div>
             <div class="card-body p-0">
                 <table class="table table-striped table-bordered mb-0">
-                    <thead class="table-dark">
+                    <thead class="table-dark">   
                         <tr>
                             <th>#</th>
-                            <th>Reservasi</th>
+                            <th>Reservasi  </th>
                             <th>Hewan</th>
                             <th>Room</th>
                             <th>Makan</th>

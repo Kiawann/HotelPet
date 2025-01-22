@@ -15,38 +15,39 @@ class DashboardController extends Controller
      * Display a listing of the resource.
      */
     public function index()
-{
-    $today = Carbon::now()->format('Y-m-d');
-
-    // Get reservations that include today's date within their check-in/check-out range
-    $activeReservations = ReservasiHotel::where('status', 'check in')
-        ->whereDate('tanggal_checkin', '<=', $today)
-        ->whereDate('tanggal_checkout', '>=', $today)
-        ->with(['rincianReservasiHotel.dataHewan', 'laporanHewan'])
-        ->get();
-
-    // Initialize counter
-    $needsReport = 0;
-
-    foreach ($activeReservations as $reservation) {
-        // Count animals through rincianReservasiHotel relationship
-        foreach ($reservation->rincianReservasiHotel as $rincian) {
-            // Check if this animal already has a report for today
-            $hasReport = $reservation->laporanHewan()
-                ->where('reservasi_hotel_id', $reservation->id)
-                ->whereDate('tanggal_laporan', $today)
-                ->where('data_hewan_id', $rincian->data_hewan_id)
-                ->exists();
-
-            // If no report exists for this animal today, increment counter
-            if (!$hasReport) {
-                $needsReport++;
+    {
+        $today = Carbon::now()->format('Y-m-d');
+    
+        // Kode sebelumnya untuk $needsReport tetap ada
+        $activeReservations = ReservasiHotel::where('status', 'check in')
+            ->whereDate('tanggal_checkin', '<=', $today)
+            ->whereDate('tanggal_checkout', '>=', $today)
+            ->with(['rincianReservasiHotel.dataHewan', 'laporanHewan'])
+            ->get();
+    
+        // Hitung needsReport seperti sebelumnya
+        $needsReport = 0;
+        foreach ($activeReservations as $reservation) {
+            foreach ($reservation->rincianReservasiHotel as $rincian) {
+                $hasReport = $reservation->laporanHewan()
+                    ->where('reservasi_hotel_id', $reservation->id)
+                    ->whereDate('tanggal_laporan', $today)
+                    ->where('data_hewan_id', $rincian->data_hewan_id)
+                    ->exists();
+    
+                if (!$hasReport) {
+                    $needsReport++;
+                }
             }
         }
+    
+        // Tambahkan perhitungan untuk checkout hari ini
+        $checkoutToday = ReservasiHotel::where('status', 'check in')
+            ->whereDate('tanggal_checkout', $today)
+            ->count();
+    
+        return view('perawat.dashboard', compact('needsReport', 'checkoutToday'));
     }
-
-    return view('perawat.dashboard', compact('needsReport'));
-}
 
 
     /**

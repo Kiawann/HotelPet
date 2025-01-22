@@ -9,6 +9,8 @@
     <form action="{{ route('laporan_hewan.store') }}" method="POST" enctype="multipart/form-data">
         @csrf
 
+        <input type="hidden" name="filter_status" value="{{ request('status') }}">
+    <input type="hidden" name="filter_date" value="{{ request('date_filter') }}">
         <div class="card shadow-sm p-4 mb-4">
             <h4 class="card-title mb-4">Detail Hewan & Reservasi</h4>
 
