@@ -35,68 +35,60 @@ public function laporan($reservasiId)
         ->orderBy('created_at', 'desc') // Mengurutkan berdasarkan tanggal laporan terbaru di atas
         ->get();
 
+         // Preserve query parameters
+    $status = request()->query('status');
+    $dateFilter = request()->query('date_filter');
+
     // Menampilkan halaman dengan daftar laporan hewan
-    return view('perawat.laporan_hewan.laporan-hewan', compact('laporanHewan', 'reservasiId'));
+    return view('perawat.laporan_hewan.laporan-hewan', compact('laporanHewan', 'reservasiId', 'status', 'dateFilter'));
 }
 
     /**
      * Show the form for creating a new resource.
      */
     // LaporanHewanController.php
-
+   
 // LaporanHewanController.php
 
 public function create(Request $request)
 {
-    // Mengambil 'reservasi_id' dari query parameter atau route parameter
-    $reservasiId = $request->query('reservasi_id'); 
+    $reservasiId = $request->query('reservasi_id');
 
-    // Pastikan bahwa 'reservasi_id' ada
     if (!$reservasiId) {
         return redirect()->route('reservasi_hotel.index')->with('error', 'Reservasi ID tidak ditemukan.');
     }
 
-    // Mendapatkan data ReservasiHotel berdasarkan ID
     $reservasiHotel = ReservasiHotel::findOrFail($reservasiId);
-
-    // Mendapatkan tanggal hari ini
     $today = now()->toDateString();
 
-    // Mendapatkan data hewan yang belum memiliki laporan hari ini dalam ID reservasi ini
     $dataHewans = $reservasiHotel->rincianReservasiHotel->filter(function ($rincian) use ($today, $reservasiId) {
-        // Memeriksa apakah laporan hari ini sudah ada untuk ID reservasi ini
         $existingReport = $rincian->dataHewan->laporanHewan->where('reservasi_hotel_id', $reservasiId)
             ->first(function ($laporan) use ($today) {
-                // Pastikan tanggal laporan sesuai
                 $laporanDate = \Carbon\Carbon::parse($laporan->tanggal_laporan)->toDateString();
                 return $laporanDate == $today;
             });
-
-        // Jika laporan tidak ada untuk ID reservasi ini pada hari ini, hewan bisa dilaporkan
         return !$existingReport;
     })->map(function ($rincian) use ($reservasiHotel) {
-        // Mengambil room_id yang sesuai dengan rincian reservasi
-        $roomId = $rincian->room_id; // Ambil room_id dari rincian reservasi
-        
-        // Cari room yang sesuai dengan room_id dari rincian reservasi dalam reservasi_hotel
+        $roomId = $rincian->room_id;
         $room = $reservasiHotel->rooms->firstWhere('id', $roomId);
-        
-        // Pastikan mengambil nama ruangan yang sesuai dengan room_id
-        $rincian->room_name = $room ? $room->nama_ruangan : 'Tidak ada ruangan'; // Ambil nama ruangan jika ada
+        $rincian->room_name = $room ? $room->nama_ruangan : 'Tidak ada ruangan';
         return $rincian;
     });
 
-    // Mengirimkan data ke view
-    return view('perawat.laporan_hewan.create', compact('dataHewans', 'reservasiId'));
+    // Pass filter parameters to view
+    return view('perawat.laporan_hewan.create', [
+        'dataHewans' => $dataHewans,
+        'reservasiId' => $reservasiId,
+        'filter_status' => $request->query('status'),
+        'filter_date' => $request->query('date_filter')
+    ]);
 }
-
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+   public function store(Request $request)
 {
-    //dd($request->all());
     $validatedData = $request->validate([
         'reservasi_hotel_id' => 'required|exists:reservasi_hotel,id',
         'data_hewan_id' => 'required|exists:data_hewan,id',
@@ -107,39 +99,53 @@ public function create(Request $request)
         'Bak' => 'required|string|max:255',
         'keterangan' => 'nullable|string',
         'tanggal_laporan' => 'required|date',
-        'foto' => 'nullable|array', // Mengizinkan array untuk foto
-        'foto.*' => 'nullable|image|mimes:jpg,png,jpeg,gif|max:2048', // Validasi tiap file gambar
-        'video' => 'nullable|array', // Mengizinkan array untuk video
-        'video.*' => 'nullable|mimes:mp4,mov,avi,wmv|max:10240', // Validasi tiap file video
+        'foto' => 'nullable|array',
+        'foto.*' => 'nullable|image|mimes:jpg,png,jpeg,gif|max:2048',
+        'video' => 'nullable|array',
+        'video.*' => 'nullable|mimes:mp4,mov,avi,wmv|max:10240',
+        // Tambahkan validasi untuk filter
+        'filter_status' => 'nullable|string',
+        'filter_date' => 'nullable|string',
     ]);
 
-    // Proses upload foto jika ada
     if ($request->hasFile('foto')) {
         $fotoPaths = [];
         foreach ($request->file('foto') as $foto) {
-            $fotoPaths[] = $foto->store('laporan_hewan/foto'); // Menyimpan file foto
+            $fotoPaths[] = $foto->store('laporan_hewan/foto');
         }
-        $validatedData['foto'] = json_encode($fotoPaths); // Menyimpan daftar path foto sebagai JSON
+        $validatedData['foto'] = json_encode($fotoPaths);
     }
 
-    // Proses upload video jika ada
     if ($request->hasFile('video')) {
         $videoPaths = [];
         foreach ($request->file('video') as $video) {
-            $videoPaths[] = $video->store('laporan_hewan/video'); // Menyimpan file video
+            $videoPaths[] = $video->store('laporan_hewan/video');
         }
-        $validatedData['video'] = json_encode($videoPaths); // Menyimpan daftar path video sebagai JSON
+        $validatedData['video'] = json_encode($videoPaths);
     }
 
-    // Simpan data ke database
-    LaporanHewan::create($validatedData);
+    LaporanHewan::create([
+        'reservasi_hotel_id' => $validatedData['reservasi_hotel_id'],
+        'data_hewan_id' => $validatedData['data_hewan_id'],
+        'room_id' => $validatedData['room_id'],
+        'Makan' => $validatedData['Makan'],
+        'Minum' => $validatedData['Minum'],
+        'Bab' => $validatedData['Bab'],
+        'Bak' => $validatedData['Bak'],
+        'keterangan' => $validatedData['keterangan'],
+        'tanggal_laporan' => $validatedData['tanggal_laporan'],
+        'foto' => $validatedData['foto'] ?? null,
+        'video' => $validatedData['video'] ?? null,
+    ]);
 
-    return redirect()->route('laporan_hewan.laporan', ['reservasiId' => $validatedData['reservasi_hotel_id']])
-        ->with('success', 'Laporan hewan berhasil ditambahkan.');
+    // Redirect dengan filter parameters
+    return redirect()->route('perawat-reservasi-hotel.index', [
+        'status' => $request->input('filter_status'),
+        'date_filter' => $request->input('filter_date')
+    ])->with('success', 'Laporan hewan berhasil ditambahkan.');
 }
 
 
-    
 
     /**
      * Display the specified resource.

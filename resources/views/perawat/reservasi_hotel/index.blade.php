@@ -29,10 +29,8 @@
             <div class="col-auto">
                 <select name="status" id="status" class="form-select" onchange="this.form.submit()">
                     <option value="">Semua Status</option>
-                    {{-- <option value="di bayar" {{ request('status') == 'di bayar' ? 'selected' : '' }}>Di Bayar</option> --}}
                     <option value="check in" {{ request('status') == 'check in' ? 'selected' : '' }}>Check In</option>
                     <option value="check out" {{ request('status') == 'check out' ? 'selected' : '' }}>Check Out</option>
-                    {{-- <option value="done" {{ request('status') == 'done' ? 'selected' : '' }}>Done</option> --}}
                 </select>
             </div>
             <div class="col-auto">
@@ -42,13 +40,16 @@
                 <select name="date_filter" id="date_filter" class="form-select" onchange="this.form.submit()">
                     <option value="">Semua Tanggal</option>
                     <option value="today" {{ request('date_filter') == 'today' ? 'selected' : '' }}>Hari Ini</option>
+                    <option value="check_out_today" {{ request('date_filter') == 'check_out_today' ? 'selected' : '' }}>Check Out Hari Ini</option>
+                </select>
                 </select>
             </div>
+            
         </form>
     </div>
     
 
-    <table class="table table-bordered">
+    <table class="table table-bordered"> 
         <thead>
             <tr>
                 <th>
@@ -94,9 +95,18 @@
         
                     @if ($reservasi->status === 'check in')
                         @if (!$semuaHewanSudahLaporan)
-                            <a href="{{ route('laporan_hewan.create', ['reservasi_id' => $reservasi->id]) }}" class="btn btn-success btn-sm">Buat Laporan</a>
+                        <a href="{{ route('laporan_hewan.create', [
+                            'reservasi_id' => $reservasi->id,
+                            'status' => request('status'),
+                            'date_filter' => request('date_filter')
+                        ]) }}" class="btn btn-success btn-sm">Buat Laporan</a>
+                           
                         @else
-                            <a href="{{ route('laporan_hewan.laporan', ['reservasiId' => $reservasi->id]) }}" class="btn btn-secondary btn-sm">Lihat Laporan Hewan</a>
+                        <a href="{{ route('laporan_hewan.laporan', [
+                            'reservasiId' => $reservasi->id,
+                            'status' => request('status'),
+                            'date_filter' => request('date_filter')
+                        ]) }}" class="btn btn-secondary btn-sm">Lihat Laporan Hewan</a>
                         @endif
                     @endif
                 </td>
