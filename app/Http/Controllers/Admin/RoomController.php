@@ -12,12 +12,19 @@ class RoomController extends Controller
     /**
      * Display a listing of the resource.
      */
+    // public function index()
+    // {
+    //     $rooms = Room::with('category_hotel')->get();
+    //     return view('admin.room.index', compact('rooms'));
+    // }
     public function index()
     {
-        $rooms = Room::with('category_hotel')->get();
+        // Ambil semua ruangan dengan kategori hotel terkait dan urutkan berdasarkan nama ruangan
+        $rooms = Room::with('category_hotel')->paginate(10); // Ubah get() menjadi paginate(10)
+    
+        // Kirim data ke view
         return view('admin.room.index', compact('rooms'));
     }
-
     /**
      * Show the form for creating a new resource.
      */
@@ -63,9 +70,11 @@ class RoomController extends Controller
      */
     public function edit(string $id)
     {
-        $categories = CategoryHotel::all();
+        $room = Room::findOrFail($id); // Ambil data room berdasarkan ID
+        $categories = CategoryHotel::all(); // Ambil semua kategori hotel
         return view('admin.room.edit', compact('room', 'categories'));
     }
+    
 
     /**
      * Update the specified resource in storage.

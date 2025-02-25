@@ -8,6 +8,8 @@ use App\Models\ReservasiHotel;
 use App\Models\ReservasiLayanan;
 use App\Models\Transaksi;
 use Illuminate\Http\Request;
+use Barryvdh\DomPDF\Facade\Pdf;
+
 
 class TransaksiController extends Controller
 {
@@ -50,9 +52,33 @@ class TransaksiController extends Controller
     }
     
     
+    public function LaporanTransaksi()
+    {
+        $totals = [];
+        for ($i = 1; $i <= 12; $i++) {
+            $totals[$i] = Transaksi::whereMonth('tanggal_pembayaran', $i)
+                ->whereYear('tanggal_pembayaran', date('Y'))
+                ->sum('Subtotal');
+        }
+
+        return view('admin.transaksi.laporan', compact('totals'));
+    }
     
-    
-    
+    public function cetakPdf(Request $request)
+    {
+        $tahun = $request->input('tahun', date('Y'));
+
+        $totals = [];
+        for ($i = 1; $i <= 12; $i++) {
+            $totals[$i] = Transaksi::whereMonth('tanggal_pembayaran', $i)
+                ->whereYear('tanggal_pembayaran', $tahun)
+                ->sum('Subtotal');
+        }
+
+        $pdf = Pdf::loadView('admin.transaksi.transaksi_pdf', compact('tahun', 'totals'));
+
+        return $pdf->download("laporan-transaksi-$tahun.pdf");
+    }
     
 
     /**

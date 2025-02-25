@@ -22,7 +22,7 @@
                 <th>Kategori Hotel</th>
                 <th>Nama Ruangan</th>
                 <th>Status</th>
-                {{-- <th>Aksi</th> --}}
+                <th>Aksi</th>
             </tr>
         </thead>
         <tbody>
@@ -36,15 +36,43 @@
                             {{ $room->status }}
                         </span>
                     </td>
-                    {{-- <td>
-                        <a href="{{ route('room.edit', $room) }}" class="btn btn-warning btn-sm">Edit</a>
-                        <form action="{{ route('room.destroy', $room) }}" method="POST" class="d-inline">
-                            @csrf
-                            @method('DELETE')
-                            <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Yakin ingin menghapus?')">Hapus</button>
-                        </form>
-                    </td> --}}
+                    <td>
+                        <button class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#updateStatusModal{{ $room->id }}">
+                            Update Status
+                        </button>
+                    </td>
                 </tr>
+
+              <!-- Modal Update Status -->
+<div class="modal fade" id="updateStatusModal{{ $room->id }}" tabindex="-1" aria-labelledby="updateStatusLabel{{ $room->id }}" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="updateStatusLabel{{ $room->id }}">Update Status Ruangan</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form action="{{ route('perawat-room-update', $room->id) }}" method="POST">
+                @csrf
+                @method('PATCH')
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="status" class="form-label">Pilih Status</label>
+                        <select class="form-select" name="status" required>
+                            <option value="Tersedia" {{ $room->status == 'Tersedia' ? 'selected' : '' }}>Tersedia</option>
+                            <option value="Tidak Tersedia" {{ $room->status == 'Tidak Tersedia' ? 'selected' : '' }}>Tidak Tersedia</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                    <button type="submit" class="btn btn-primary">Simpan Perubahan</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
             @empty
                 <tr>
                     <td colspan="5" class="text-center text-muted">Tidak ada data kamar.</td>

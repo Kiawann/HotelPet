@@ -16,6 +16,8 @@
     <link
         href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i"
         rel="stylesheet">
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
 
     <!-- Custom styles for this template-->
     <link href="{{ asset('assets/startbootstrap-sb-admin-2-4.1.4') }}/css/sb-admin-2.min.css" rel="stylesheet">
@@ -88,6 +90,7 @@
             <a class="collapse-item {{ request()->routeIs('room.index') ? 'active' : '' }}" href="{{ route('room.index') }}">Ruangan</a>
             <a class="collapse-item {{ request()->routeIs('reservasi_layanan.index') ? 'active' : '' }}" href="{{ route('reservasi_layanan.index') }}">Reservasi Layanan</a>
             <a class="collapse-item {{ request()->routeIs('kategori_layanan.index') ? 'active' : '' }}" href="{{ route('kategori_layanan.index') }}">Kategori Layanan</a>
+            <a class="collapse-item {{ request()->routeIs('laporan-transaksi') ? 'active' : '' }}" href="{{ route('laporan-transaksi') }}">Laporan Transaksi</a>
         </div>
     </div>
 </li>

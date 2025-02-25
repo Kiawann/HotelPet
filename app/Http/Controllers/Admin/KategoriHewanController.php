@@ -11,7 +11,9 @@ class KategoriHewanController extends Controller
 {
     public function index()
     {
-        $kategoriHewan = KategoriHewan::all();
+        // Mengambil data kategori hewan dan mengurutkan berdasarkan nama_kategori dari A-Z
+        $kategoriHewan = KategoriHewan::orderBy('nama_kategori', 'asc')->get();
+        
         return view('admin.kategori_hewan.index', compact('kategoriHewan'));
     }
 

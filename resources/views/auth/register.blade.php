@@ -68,15 +68,9 @@
 
             <div class="mb-3">
                 <label for="phone" class="form-label">Nomor Telepon</label>
-                <input type="text" 
-                class="form-control @error('phone') is-invalid @enderror" 
-                id="phone"
-                name="phone" 
-                placeholder="081234567890"
-                value="{{ old('phone') }}"
-                maxlength="12"
-                pattern="\d{1,12}"
-                oninput="validatePhone(this)">
+                <input type="text" class="form-control @error('phone') is-invalid @enderror" id="phone"
+                    name="phone" placeholder="081234567890" value="{{ old('phone') }}" maxlength="12"
+                    pattern="\d{1,12}" oninput="validatePhone(this)">
                 @error('phone')
                     <div class="invalid-feedback">{{ $message }}</div>
                 @enderror
@@ -84,18 +78,13 @@
 
             <div class="d-grid gap-2">
                 <button type="button" class="btn btn-secondary" id="sendOtpBtn" onclick="sendOtp()">Kirim OTP</button>
-<span id="otpTimer" class="text-muted ms-2"></span> <!-- Timer countdown -->
+                <span id="otpTimer" class="text-muted ms-2"></span> <!-- Timer countdown -->
             </div>
 
             <div class="mb-3 mt-3">
                 <label for="otp" class="form-label">Kode OTP</label>
-                <input type="text" 
-                    class="form-control @error('otp') is-invalid @enderror" 
-                    id="otp"
-                    name="otp" 
-                    value="{{ old('otp') }}" 
-                    maxlength="6" 
-                    pattern="\d{6}"
+                <input type="text" class="form-control @error('otp') is-invalid @enderror" id="otp"
+                    name="otp" value="{{ old('otp') }}" maxlength="6" pattern="\d{6}"
                     oninput="validateOtp(this)">
                 @error('otp')
                     <div class="invalid-feedback">{{ $message }}</div>
@@ -132,60 +121,62 @@
     <script>
         let countdownTime = sessionStorage.getItem("otpCountdown") || 0;
         let countdownInterval;
-    
+
         function validateOtp(input) {
             input.value = input.value.replace(/\D/g, '').slice(0, 6);
         }
-    
+
         function sendOtp() {
             const phone = document.getElementById('phone').value;
             const sendOtpBtn = document.getElementById('sendOtpBtn');
             const otpInput = document.getElementById('otp');
             const otpTimer = document.getElementById('otpTimer');
-    
+
             if (!phone) {
                 showError("Silakan masukkan nomor telepon.");
                 return;
             }
-    
+
             sendOtpBtn.innerHTML = "Mengirim...";
             sendOtpBtn.disabled = true;
-    
+
             fetch("{{ route('send-otp') }}", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    "X-CSRF-TOKEN": "{{ csrf_token() }}"
-                },
-                body: JSON.stringify({ phone: phone })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    showSuccess("OTP telah dikirim ke " + phone);
-                    otpInput.removeAttribute('readonly'); // Mengaktifkan input OTP
-                    startOtpTimer(sendOtpBtn, otpTimer, true); // Memulai countdown & simpan state
-                } else {
-                    showError(data.message || "Gagal mengirim OTP, coba lagi nanti.");
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "X-CSRF-TOKEN": "{{ csrf_token() }}"
+                    },
+                    body: JSON.stringify({
+                        phone: phone
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        showSuccess("OTP telah dikirim ke " + phone);
+                        otpInput.removeAttribute('readonly'); // Mengaktifkan input OTP
+                        startOtpTimer(sendOtpBtn, otpTimer, true); // Memulai countdown & simpan state
+                    } else {
+                        showError(data.message || "Gagal mengirim OTP, coba lagi nanti.");
+                        sendOtpBtn.innerHTML = "Kirim OTP";
+                        sendOtpBtn.disabled = false;
+                    }
+                })
+                .catch(() => {
+                    showError("Terjadi kesalahan, silakan coba lagi nanti.");
                     sendOtpBtn.innerHTML = "Kirim OTP";
                     sendOtpBtn.disabled = false;
-                }
-            })
-            .catch(() => {
-                showError("Terjadi kesalahan, silakan coba lagi nanti.");
-                sendOtpBtn.innerHTML = "Kirim OTP";
-                sendOtpBtn.disabled = false;
-            });
+                });
         }
-    
+
         function startOtpTimer(button, timerSpan, reset = false) {
             if (reset) {
                 countdownTime = 60; // Atur ulang jika mengirim OTP baru
             }
-    
+
             sessionStorage.setItem("otpCountdown", countdownTime);
             button.disabled = true; // Pastikan tombol tetap dinonaktifkan
-    
+
             countdownInterval = setInterval(() => {
                 if (countdownTime > 0) {
                     timerSpan.innerHTML = `Tunggu ${countdownTime} detik`;
@@ -201,30 +192,30 @@
                 }
             }, 1000);
         }
-    
+
         function restoreCountdown() {
             const sendOtpBtn = document.getElementById("sendOtpBtn");
             const otpTimer = document.getElementById("otpTimer");
-    
+
             if (countdownTime > 0) {
                 startOtpTimer(sendOtpBtn, otpTimer, false);
             }
         }
-    
+
         function showError(message) {
             document.getElementById('alertContainer').innerHTML =
                 `<div class="alert alert-danger my-2" role="alert">${message}</div>`;
         }
-    
+
         function showSuccess(message) {
             document.getElementById('alertContainer').innerHTML =
                 `<div class="alert alert-success my-2" role="alert">${message}</div>`;
         }
-    
+
         function togglePassword(inputId) {
             const passwordInput = document.getElementById(inputId);
             const icon = passwordInput.nextElementSibling;
-    
+
             if (passwordInput.type === 'password') {
                 passwordInput.type = 'text';
                 icon.classList.remove('fa-eye-slash');
@@ -235,11 +226,11 @@
                 icon.classList.add('fa-eye-slash');
             }
         }
-    
+
         document.getElementById("registrationForm").addEventListener("submit", function(event) {
             const otpInput = document.getElementById("otp");
             const sendOtpBtn = document.getElementById("sendOtpBtn");
-    
+
             if (otpInput.value.length !== 6) {
                 showError("Kode OTP harus 6 digit.");
                 otpInput.value = ""; // Reset hanya input OTP
@@ -247,10 +238,10 @@
                 return;
             }
         });
-    
+
         window.onload = function() {
             restoreCountdown();
-    
+
             // Mengisi ulang password agar tidak hilang setelah refresh
             if (localStorage.getItem("password")) {
                 document.getElementById("password").value = localStorage.getItem("password");
@@ -259,11 +250,11 @@
         };
 
         function validatePhone(input) {
-    // Menghapus semua karakter non-digit
-    input.value = input.value.replace(/\D/g, '').slice(0, 12);
-}
+            // Menghapus semua karakter non-digit
+            input.value = input.value.replace(/\D/g, '').slice(0, 12);
+        }
     </script>
-    
+
     <style>
         /* Sembunyikan ikon 'show password' bawaan browser */
         input[type="password"]::-ms-reveal,

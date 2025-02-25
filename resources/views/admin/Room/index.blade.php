@@ -5,7 +5,6 @@
 @section('content')
 <div class="container mt-5">
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h1 class="text-primary">Daftar Kamar</h1>
         <a href="{{ route('room.create') }}" class="btn btn-primary">Tambah Kamar</a>
     </div>
 
@@ -52,5 +51,27 @@
             @endforelse
         </tbody>
     </table>
+
+    <div class="mt-3">
+        <nav aria-label="Page navigation">
+            <ul class="pagination pagination-sm">
+                <li class="page-item">
+                    <a class="page-link" href="{{ $rooms->previousPageUrl() }}" aria-label="Previous">
+                        <span aria-hidden="true">&laquo;</span>
+                    </a>
+                </li>
+                @foreach ($rooms->getUrlRange(1, $rooms->lastPage()) as $page => $url)
+                    <li class="page-item {{ ($rooms->currentPage() == $page) ? 'active' : '' }}">
+                        <a class="page-link" href="{{ $url }}">{{ $page }}</a>
+                    </li>
+                @endforeach
+                <li class="page-item">
+                    <a class="page-link" href="{{ $rooms->nextPageUrl() }}" aria-label="Next">
+                        <span aria-hidden="true">&raquo;</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    </div>
 </div>
 @endsection

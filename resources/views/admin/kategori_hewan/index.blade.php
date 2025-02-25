@@ -3,12 +3,12 @@
 @section('title', 'Data Kategori Hewan')
 
 @section('content')
-    <h1>Data Kategori Hewan</h1>
     <a href="{{ route('kategori_hewan.create') }}" class="btn btn-primary">Tambah Kategori</a>
     
     <table class="table table-bordered mt-3">
         <thead>
             <tr>
+                <th>No</th>
                 <th>ID Kategori Hewan</th>
                 <th>Nama Kategori</th>
                 <th>Aksi</th>
@@ -17,6 +17,7 @@
         <tbody>
             @foreach ($kategoriHewan as $kategori)
                 <tr>
+                    <td>{{ $loop->iteration }}</td>
                     <td>{{ $kategori->id }}</td>
                     <td>{{ $kategori->nama_kategori }}</td>
                     <td>

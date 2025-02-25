@@ -16,7 +16,7 @@ class DataHewan extends Model
 
     public function pemilik()
     {
-        return $this->belongsTo(DataPemilik::class, 'data_pemilik_id');
+        return $this->belongsTo(DataPemilik::class, 'data_pemilik_id', 'id');
     }
 
     public function kategoriHewan()
@@ -27,5 +27,10 @@ class DataHewan extends Model
     public function laporanHewan()
     {
         return $this->hasMany(LaporanHewan::class, 'data_hewan_id');
+    }
+
+    public function rincianReservasiHotel()
+    {
+        return $this->hasMany(RincianReservasiHotel::class, 'data_hewan_id');
     }
 }

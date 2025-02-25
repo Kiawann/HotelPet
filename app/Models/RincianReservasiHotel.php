@@ -3,7 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Factories\HasFactory;  
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class RincianReservasiHotel extends Model
 {
@@ -27,7 +27,7 @@ class RincianReservasiHotel extends Model
      */
     public function reservasiHotel()
     {
-        return $this->belongsTo(ReservasiHotel::class, 'reservasi_hotel_id');
+        return $this->belongsTo(ReservasiHotel::class, 'reservasi_hotel_id', 'id');
     }
 
     /**
@@ -35,7 +35,7 @@ class RincianReservasiHotel extends Model
      */
     public function dataHewan()
     {
-        return $this->belongsTo(DataHewan::class, 'data_hewan_id');
+        return $this->belongsTo(DataHewan::class, 'data_hewan_id', 'id');
     }
 
     /**
@@ -43,7 +43,7 @@ class RincianReservasiHotel extends Model
      */
     public function room()
     {
-        return $this->belongsTo(Room::class, 'room_id');
+        return $this->belongsTo(Room::class, 'room_id', 'id');
     }
 
     // Relasi ke model DataPemilik
@@ -52,5 +52,13 @@ class RincianReservasiHotel extends Model
         return $this->belongsTo(DataPemilik::class, 'data_pemilik_id');
     }
 
-    
+    public function laporanHewan()
+    {
+        return $this->hasMany(LaporanHewan::class, 'reservasi_hotel_id', 'id');
+    }
+
+    public function transaksi()
+    {
+        return $this->hasMany(Transaksi::class, 'reservasi_hotel_id', 'id');
+    }
 }

@@ -10,17 +10,25 @@
 <body>
 
 <div class="container" style="margin-top: 50px">
-    <form method="POST" action="{{ route('password.email') }}">
-        @csrf
-        <label for="email">Email</label>
-        <input type="email" name="email" id="email" required>
-        @if ($errors->has('email'))
-            <span>{{ $errors->first('email') }}</span>
+    <div class="card-body">
+        @if($message = session('status'))
+        <div class="alert alert-success my-2 text-success" role="alert">{{ $message }}</div>
         @endif
-        <button type="submit">Kirim Link Reset</button>
-    </form>
-</div>
+        <p class="text-center">Enter your phone number to receive OTP code</p>
+        <form action="{{ route('send-otp-forgot') }}" method="POST">
+            @csrf
+            <div class="mb-3">
+                <input name="phone" type="text" oninput="this.value = this.value.replace(/[^0-9]/g, '');" minlength="10" maxlength="13" class="form-control text-center @error('phone') is-invalid @enderror" id="floatingInput" placeholder="08XXXXXXXXXX" value="{{ auth()->user()->phone ?? old('phone') }}" {{ isset(auth()->user()->phone) ? 'readonly' : 'required' }}>
+                @error('phone')
+                    <div class="invalid-feedback">{{ $message }}</div>
+                @enderror
+            </div>
+            <button class="w-100 btn btn-primary" type="submit">Send OTP</button>
+        </form>
+        {{-- <a href="{{ isset(auth()->user()->phone) ? url()->previous() : route('login') }}" class="btn btn-back w-100 mt-3">Back</a> --}}
+    </div>
 
 <div class="text-center mt-4">
     <a href="{{ route('login') }}" class="btn btn-primary btn-lg">Kembali</a>
 </div>
+

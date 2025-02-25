@@ -52,49 +52,64 @@
         @if($reservasi->transaksi)
             <table class="table table-bordered">
                 <tbody>
-                    <tr>
-                        <th>ID Transaksi</th>
-                        <td>{{ $reservasi->transaksi->id }}</td>
-                    </tr>
-                    <tr>
-                        <th>Nama Pemilik</th>
-                        <td>{{ $reservasi->transaksi->dataPemilik->nama ?? 'Tidak tersedia' }}</td>
-                    </tr>
-                    <tr>
-                        <th>Tanggal Pembayaran</th>
-                        <td>{{ $reservasi->transaksi->tanggal_pembayaran ?? 'Belum dibayar' }}</td>
-                    </tr>
-                    <tr>
-                        <th>Subtotal</th>
-                        <td>Rp{{ number_format($reservasi->transaksi->Subtotal, 0, ',', '.') }}</td>
-                    </tr>
-                    <tr>
-                        <th>Dibayar</th>
-                        <td>Rp{{ number_format($reservasi->transaksi->Dibayar, 0, ',', '.') }}</td>
-                    </tr>
-                    <tr>
-                        <th>Kembalian</th>
-                        <td>Rp{{ number_format($reservasi->transaksi->Kembalian, 0, ',', '.') }}</td>
-                    </tr>
-                    <tr>
-                        <th>Status Pembayaran</th>
-                        <td>
-                            <span class="badge {{ $reservasi->transaksi->status_pembayaran === 'lunas' ? 'bg-success' : 'bg-warning' }}">
-                                {{ ucfirst($reservasi->transaksi->status_pembayaran) }}
-                            </span>
-                        </td>
-                    </tr>
                     @if($reservasi->transaksi->status_pembayaran === 'Transfer')
+                        <!-- Hanya tampilkan informasi yang relevan untuk status pembayaran 'Transfer' -->
+                        <tr>
+                            <th>Subtotal</th>
+                            <td>Rp{{ number_format($reservasi->transaksi->Subtotal, 0, ',', '.') }}</td>
+                        </tr>
+                        <tr>
+                            <th>Status Pembayaran</th>
+                            <td>
+                                <span class="badge {{ $reservasi->transaksi->status_pembayaran === 'lunas' ? 'bg-success' : 'bg-warning' }}">
+                                    {{ ucfirst($reservasi->transaksi->status_pembayaran) }}
+                                </span>
+                            </td>
+                        </tr>
                         <tr>
                             <th>Bukti Transfer</th>
                             <td>
                                 @if($reservasi->transaksi->Foto_Transfer)
-                                    <a href="{{ asset('uploads/' . $reservasi->transaksi->Foto_Transfer) }}" target="_blank">
-                                        <img src="{{ asset('uploads/' . $reservasi->transaksi->Foto_Transfer) }}" alt="Bukti Transfer" style="max-height: 100px;">
+                                    <a href="{{ asset('storage/' . $reservasi->transaksi->Foto_Transfer) }}" target="_blank">
+                                        <img src="{{ asset('storage/' . $reservasi->transaksi->Foto_Transfer) }}" alt="Bukti Transfer" style="max-height: 100px;">
                                     </a>
                                 @else
                                     <span class="text-muted">Belum tersedia</span>
                                 @endif
+                            </td>
+                        </tr>
+                    @else
+                        <!-- Tampilkan informasi lengkap jika status pembayaran bukan 'Transfer' -->
+                        <tr>
+                            <th>ID Transaksi</th>
+                            <td>{{ $reservasi->transaksi->id }}</td>
+                        </tr>
+                        <tr>
+                            <th>Nama Pemilik</th>
+                            <td>{{ $reservasi->transaksi->dataPemilik->nama ?? 'Tidak tersedia' }}</td>
+                        </tr>
+                        <tr>
+                            <th>Tanggal Pembayaran</th>
+                            <td>{{ $reservasi->transaksi->tanggal_pembayaran ?? 'Belum dibayar' }}</td>
+                        </tr>
+                        <tr>
+                            <th>Subtotal</th>
+                            <td>Rp{{ number_format($reservasi->transaksi->Subtotal, 0, ',', '.') }}</td>
+                        </tr>
+                        <tr>
+                            <th>Dibayar</th>
+                            <td>Rp{{ number_format($reservasi->transaksi->Dibayar, 0, ',', '.') }}</td>
+                        </tr>
+                        <tr>
+                            <th>Kembalian</th>
+                            <td>Rp{{ number_format($reservasi->transaksi->Kembalian, 0, ',', '.') }}</td>
+                        </tr>
+                        <tr>
+                            <th>Status Pembayaran</th>
+                            <td>
+                                <span class="badge {{ $reservasi->transaksi->status_pembayaran === 'lunas' ? 'bg-success' : 'bg-warning' }}">
+                                    {{ ucfirst($reservasi->transaksi->status_pembayaran) }}
+                                </span>
                             </td>
                         </tr>
                     @endif
@@ -109,6 +124,5 @@
             <a href="{{ url()->previous() }}" class="btn btn-secondary">Kembali</a>
         </div>
     </div>
-    
 </div>
 @endsection

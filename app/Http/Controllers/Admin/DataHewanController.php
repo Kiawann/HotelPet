@@ -11,10 +11,57 @@ use App\Models\KategoriHewan;
 
 class DataHewanController extends Controller
 {
-    public function index()
+    // public function index(Request $request)
+    // {
+    //     $query = DataHewan::with(['kategoriHewan', 'pemilik']);
+        
+    //     // Filter berdasarkan kategori hewan
+    //     if ($request->filled('kategori')) {
+    //         $query->whereHas('kategoriHewan', function ($q) use ($request) {
+    //             $q->where('id', $request->kategori);
+    //         });
+    //     }
+        
+    //     // Pencarian berdasarkan nama hewan atau pemilik
+    //     if ($request->filled('search')) {
+    //         $query->where(function ($q) use ($request) {
+    //             $q->where('nama_hewan', 'like', '%' . $request->search . '%')
+    //               ->orWhereHas('pemilik', function ($q) use ($request) {
+    //                   $q->where('nama', 'like', '%' . $request->search . '%');
+    //               });
+    //         });
+    //     }
+        
+    //     $dataHewan = $query->orderBy('nama_hewan')->get();
+    //     $kategoriHewan = KategoriHewan::all();
+        
+    //     return view('admin.data_hewan.index', compact('dataHewan', 'kategoriHewan'));
+    // }
+    public function index(Request $request)
     {
-        $dataHewan = DataHewan::with(['kategoriHewan', 'pemilik'])->get();
-        return view('admin.data_hewan.index', compact('dataHewan'));
+        $query = DataHewan::with(['kategoriHewan', 'pemilik']);
+        
+        // Filter berdasarkan kategori hewan
+        if ($request->filled('kategori')) {
+            $query->whereHas('kategoriHewan', function ($q) use ($request) {
+                $q->where('id', $request->kategori);
+            });
+        }
+        
+        // Pencarian berdasarkan nama hewan atau pemilik
+        if ($request->filled('search')) {
+            $query->where(function ($q) use ($request) {
+                $q->where('nama_hewan', 'like', '%' . $request->search . '%')
+                  ->orWhereHas('pemilik', function ($q) use ($request) {
+                      $q->where('nama', 'like', '%' . $request->search . '%');
+                  });
+            });
+        }
+        
+        $dataHewan = $query->orderBy('nama_hewan')->paginate(10);
+        $kategoriHewan = KategoriHewan::all();
+        
+        return view('admin.data_hewan.index', compact('dataHewan', 'kategoriHewan'));
     }
 
     public function create()

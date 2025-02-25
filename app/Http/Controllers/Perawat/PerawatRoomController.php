@@ -12,10 +12,11 @@ class PerawatRoomController extends Controller
      * Display a listing of the resource.
      */
     public function index()
-    {
-        $rooms = Room::with('category_hotel')->get();
-        return view('perawat.room.index', compact('rooms'));
-    }
+{
+    $rooms = Room::with('category_hotel')->paginate(10);
+    return view('perawat.room.index', compact('rooms'));
+}
+
 
     /**
      * Show the form for creating a new resource.
@@ -55,6 +56,19 @@ class PerawatRoomController extends Controller
     public function update(Request $request, string $id)
     {
         //
+    }
+
+    public function updateStatus(Request $request, Room $room)
+    {
+        $request->validate([
+            'status' => 'required|in:Tersedia,Tidak Tersedia',
+        ]);
+
+        $room->update([
+            'status' => $request->status,
+        ]);
+
+        return redirect()->route('perawat-room.index')->with('success', 'Status ruangan berhasil diperbarui.');
     }
 
     /**
