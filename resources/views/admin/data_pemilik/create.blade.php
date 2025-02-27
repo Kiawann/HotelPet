@@ -7,62 +7,42 @@
             <h3 class="card-title">Tambah User Baru</h3>
         </div>
         <div class="card-body">
-
-            <div class="card-body">
-                <div id="alert-message" class="alert d-none"></div> <!-- Pesan akan muncul di sini -->
-                <form action="{{ route('admin-user-store') }}" method="POST">
+            <div id="alert-message" class="alert d-none"></div> <!-- Pesan akan muncul di sini -->
             
             <form action="{{ route('admin-user-store') }}" method="POST">
                 @csrf
                 <div class="mb-3">
                     <label for="name" class="form-label">Nama</label>
-                    <input type="text" class="form-control @error('name') is-invalid @enderror" 
-                           id="name" name="name" value="{{ old('name') }}" >
+                    <input type="text" class="form-control @error('name') is-invalid @enderror" id="name" name="name" value="{{ old('name') }}">
                     @error('name')
                         <div class="invalid-feedback">{{ $message }}</div>
                     @enderror
                 </div>
+                
                 <div class="mb-3">
                     <label for="phone" class="form-label">Nomor Telepon</label>
-                    <input type="text" 
-                    class="form-control @error('phone') is-invalid @enderror" 
-                    id="phone"
-                    name="phone" 
-                    placeholder="081234567890"
-                    value="{{ old('phone') }}"
-                    maxlength="12"
-                    pattern="\d{1,12}"
-                    oninput="validatePhone(this)">
+                    <input type="text" class="form-control @error('phone') is-invalid @enderror" id="phone" name="phone" placeholder="081234567890" value="{{ old('phone') }}" maxlength="12" pattern="\d{1,12}" oninput="validatePhone(this)">
                     @error('phone')
                         <div class="invalid-feedback">{{ $message }}</div>
                     @enderror
                 </div>
-    
+                
                 <div class="d-grid gap-2">
                     <button type="button" class="btn btn-secondary" id="sendOtpBtn" onclick="sendOtp()">Kirim OTP</button>
-    <span id="otpTimer" class="text-muted ms-2"></span> <!-- Timer countdown -->
+                    <span id="otpTimer" class="text-muted ms-2"></span> <!-- Timer countdown -->
                 </div>
-    
+                
                 <div class="mb-3 mt-3">
                     <label for="otp" class="form-label">Kode OTP</label>
-                    <input type="text" 
-                        class="form-control @error('otp') is-invalid @enderror" 
-                        id="otp"
-                        name="otp" 
-                        value="{{ old('otp') }}" 
-                        maxlength="6" 
-                        pattern="\d{6}"
-                        oninput="validateOtp(this)">
+                    <input type="text" class="form-control @error('otp') is-invalid @enderror" id="otp" name="otp" value="{{ old('otp') }}" maxlength="6" pattern="\d{6}" oninput="validateOtp(this)">
                     @error('otp')
                         <div class="invalid-feedback">{{ $message }}</div>
                     @enderror
                 </div>
-
-               
-
+                
                 <div class="mb-3">
                     <label for="role" class="form-label">Role</label>
-                    <select class="form-select @error('role') is-invalid @enderror" id="role" name="role" >
+                    <select class="form-select @error('role') is-invalid @enderror" id="role" name="role">
                         <option value="">Pilih Role</option>
                         <option value="perawat">Perawat</option>
                         <option value="kasir">Kasir</option>
@@ -71,9 +51,11 @@
                         <div class="invalid-feedback">{{ $message }}</div>
                     @enderror
                 </div>
-
-                <button type="submit" class="btn btn-primary">Simpan</button>
-                <a href="{{ route('data_pemilik.index') }}" class="btn btn-secondary">Kembali</a>
+                
+                <div class="d-flex justify-content-between">
+                    <button type="submit" class="btn btn-primary">Simpan</button>
+                    <a href="{{ route('data_pemilik.index') }}" class="btn btn-secondary">Kembali</a>
+                </div>
             </form>
         </div>
     </div>
@@ -107,8 +89,8 @@
         .then(data => {
             if (data.success) {
                 showMessage("OTP telah dikirim ke " + phone, "success");
-                otpInput.removeAttribute('readonly'); // Mengaktifkan input OTP
-                startOtpTimer(sendOtpBtn, otpTimer, true); // Mulai countdown
+                otpInput.removeAttribute('readonly');
+                startOtpTimer(sendOtpBtn, otpTimer, true);
             } else {
                 showMessage(data.message || "Gagal mengirim OTP, coba lagi nanti.", "danger");
                 sendOtpBtn.innerHTML = "Kirim OTP";
@@ -126,22 +108,23 @@
         const alertMessage = document.getElementById('alert-message');
         alertMessage.className = `alert alert-${type}`;
         alertMessage.innerHTML = message;
-        alertMessage.classList.remove('d-none'); // Munculkan pesan
+        alertMessage.classList.remove('d-none');
     
         setTimeout(() => {
-            alertMessage.classList.add('d-none'); // Sembunyikan setelah 5 detik
+            alertMessage.classList.add('d-none');
         }, 5000);
     }
     
     function startOtpTimer(button, timerSpan, reset = false) {
+        let countdownTime = 60;
         if (reset) {
             countdownTime = 60;
         }
-    
+        
         sessionStorage.setItem("otpCountdown", countdownTime);
         button.disabled = true;
     
-        countdownInterval = setInterval(() => {
+        const countdownInterval = setInterval(() => {
             if (countdownTime > 0) {
                 timerSpan.innerHTML = `Tunggu ${countdownTime} detik`;
                 button.innerHTML = `Tunggu ${countdownTime}s`;
@@ -156,6 +139,5 @@
             }
         }, 1000);
     }
-    </script>
-    
+</script>
 @endsection

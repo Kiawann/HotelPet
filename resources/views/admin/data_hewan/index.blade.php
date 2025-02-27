@@ -13,73 +13,73 @@
         </select>
         <input type="text" id="searchHewan" class="form-control w-25 d-inline" placeholder="Cari hewan atau pemilik...">
     </div>
-    <table class="table table-bordered mt-3">
-        <thead>
-            <tr>
-                <th>Nama Hewan</th>
-                <th>Pemilik</th>
-                <th>Kategori Hewan</th>
-                <th>Umur (bulan)</th>
-                <th>Berat Badan (kg)</th>
-                <th>Jenis Kelamin</th>
-                <th>Warna</th>
-                <th>Ras Hewan</th>
-                <th>Foto</th>
-                <th>Aksi</th>
-            </tr>
-        </thead>
-        <tbody id="tableBody">
-            @foreach($dataHewan as $hewan)
-            <tr data-kategori="{{ $hewan->kategoriHewan->id ?? '' }}">
-                <td>{{ $hewan->nama_hewan }}</td>
-                <td>{{ $hewan->pemilik->nama ?? 'Tidak ada pemilik' }}</td>
-                <td>{{ $hewan->kategoriHewan->nama_kategori ?? 'Tidak ada kategori' }}</td>
-                <td>{{ $hewan->umur }}</td>
-                <td>{{ $hewan->berat_badan }}</td>
-                <td>{{ $hewan->jenis_kelamin }}</td>
-                <td>{{ $hewan->warna }}</td>
-                <td>{{ $hewan->ras_hewan }}</td>
-                <td>
-                    @if ($hewan->foto)
-                        <img src="{{ asset('storage/' . $hewan->foto) }}" alt="Foto" width="50">
-                    @else
-                        Tidak ada foto
-                    @endif
-                </td>
-                <td>
-                    <a href="{{ route('data_hewan.edit', $hewan->id) }}" class="btn btn-warning btn-sm">Edit</a>
-                    {{-- <form action="{{ route('data_hewan.destroy', $hewan->id) }}" method="POST" style="display:inline;">
-                        @csrf
-                        @method('DELETE')
-                        <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Yakin ingin menghapus?')">Hapus</button>
-                    </form> --}}
-                </td>
-            </tr>
-            @endforeach
-        </tbody>
-    </table>
 
-    <div class="mt-3">
-        <nav aria-label="Page navigation">
-            <ul class="pagination pagination-sm">
-                <li class="page-item">
-                    <a class="page-link" href="{{ $dataHewan->previousPageUrl() }}" aria-label="Previous">
-                        <span aria-hidden="true">&laquo;</span>
-                    </a>
-                </li>
-                @foreach ($dataHewan->getUrlRange(1, $dataHewan->lastPage()) as $page => $url)
-                    <li class="page-item {{ ($dataHewan->currentPage() == $page) ? 'active' : '' }}">
-                        <a class="page-link" href="{{ $url }}">{{ $page }}</a>
-                    </li>
+    <!-- Tambahkan div pembungkus agar tabel bisa di-scroll -->
+    <div class="table-responsive" style="max-height: 400px; overflow-y: auto; margin-top: 10px;">
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>Nama Hewan</th>
+                    <th>Pemilik</th>
+                    <th>Kategori Hewan</th>
+                    <th>Umur (bulan)</th>
+                    <th>Berat Badan (kg)</th>
+                    <th>Jenis Kelamin</th>
+                    <th>Warna</th>
+                    <th>Ras Hewan</th>
+                    <th>Foto</th>
+                    <th>Aksi</th>
+                </tr>
+            </thead>
+            <tbody id="tableBody">
+                @foreach($dataHewan as $hewan)
+                <tr data-kategori="{{ $hewan->kategoriHewan->id ?? '' }}">
+                    <td>{{ $hewan->nama_hewan }}</td>
+                    <td>{{ $hewan->pemilik->nama ?? 'Tidak ada pemilik' }}</td>
+                    <td>{{ $hewan->kategoriHewan->nama_kategori ?? 'Tidak ada kategori' }}</td>
+                    <td>{{ $hewan->umur }}</td>
+                    <td>{{ $hewan->berat_badan }}</td>
+                    <td>{{ $hewan->jenis_kelamin }}</td>
+                    <td>{{ $hewan->warna }}</td>
+                    <td>{{ $hewan->ras_hewan }}</td>
+                    <td>
+                        @if ($hewan->foto)
+                            <img src="{{ asset('storage/' . $hewan->foto) }}" alt="Foto" width="50">
+                        @else
+                            Tidak ada foto
+                        @endif
+                    </td>
+                    <td>
+                        <a href="{{ route('data_hewan.edit', $hewan->id) }}" class="btn btn-warning btn-sm">Edit</a>
+                    </td>
+                </tr>
                 @endforeach
-                <li class="page-item">
-                    <a class="page-link" href="{{ $dataHewan->nextPageUrl() }}" aria-label="Next">
-                        <span aria-hidden="true">&raquo;</span>
-                    </a>
-                </li>
-            </ul>
-        </nav>
+            </tbody>
+        </table>
+        <div class="mt-3">
+            <nav aria-label="Page navigation">
+                <ul class="pagination pagination-sm">
+                    <li class="page-item">
+                        <a class="page-link" href="{{ $dataHewan->previousPageUrl() }}" aria-label="Previous">
+                            <span aria-hidden="true">&laquo;</span>
+                        </a>
+                    </li>
+                    @foreach ($dataHewan->getUrlRange(1, $dataHewan->lastPage()) as $page => $url)
+                        <li class="page-item {{ ($dataHewan->currentPage() == $page) ? 'active' : '' }}">
+                            <a class="page-link" href="{{ $url }}">{{ $page }}</a>
+                        </li>
+                    @endforeach
+                    <li class="page-item">
+                        <a class="page-link" href="{{ $dataHewan->nextPageUrl() }}" aria-label="Next">
+                            <span aria-hidden="true">&raquo;</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
     </div>
+
+
     <script>
         document.addEventListener("DOMContentLoaded", function () {
             const searchInput = document.getElementById('searchHewan');
