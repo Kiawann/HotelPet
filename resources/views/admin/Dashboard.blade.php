@@ -14,6 +14,8 @@
                 $totalPerawat = \App\Models\User::where('role', 'perawat')->count();
                 $totalKasir = \App\Models\User::where('role', 'kasir')->count();
                 $totalPembayaran = \App\Models\ReservasiHotel::where('status', 'di bayar')->sum('total');
+                $totalDenda = \App\Models\RincianReservasiHotel::sum('denda');
+
             @endphp
             
 
@@ -78,7 +80,15 @@
                     </div>
                 </div>
             </div>
-            
+            <div class="col mx-auto">
+                <div class="card bg-primary text-white h-100 shadow-lg" style="height: 180px; border-radius: 12px;">
+                    <div class="card-body d-flex flex-column justify-content-center text-center">
+                        <i class="fas fa-exclamation-circle fa-2x"></i>
+                        <h6 class="card-title mt-2">Total Seluruh Denda</h6>
+                        <h4 class="mb-0">Rp {{ number_format($totalDenda, 0, ',', '.') }}</h4>
+                    </div>
+                </div>
+            </div>
         </div>
     
     <!-- Total Pembayaran Card -->

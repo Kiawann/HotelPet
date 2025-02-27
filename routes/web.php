@@ -5,6 +5,7 @@ use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\KategoriHewanController;
 use App\Http\Controllers\Admin\DataHewanController;
 use App\Http\Controllers\Admin\DataPemilikController;
+use App\Http\Controllers\Admin\DendaController;
 use App\Http\Controllers\Admin\KategoriLayananController;
 use App\Http\Controllers\Perawat\LaporanHewanController;
 use App\Http\Controllers\Admin\ReservasiHotelController;
@@ -24,6 +25,7 @@ use App\Http\Controllers\Kasir\ProfilController as KasirProfilController;
 use App\Http\Controllers\Kasir\ChangePhoneController as KasirChangePhoneController;
 use App\Http\Controllers\Kasir\KasirReservasiHotelController;
 use App\Http\Controllers\Kasir\KasirTransaksiController;
+use App\Http\Controllers\Kasir\TransaksiDendaController;
 use App\Http\Controllers\Perawat\DashboardController as PerawatDashboardController;
 use App\Http\Controllers\Perawat\PerawatProfileController;
 use App\Mail\TestEmail;
@@ -100,15 +102,19 @@ Route::middleware('auth')->group(function () {
         // Route::get('/transaksi/{id}', [TransaksiController::class, 'show'])->name('transaksi.show');
         Route::patch('/reservasi_hotel/{id}/update_status', [ReservasiHotelController::class, 'updateStatus'])->name('reservasi_hotel.update_status');
         Route::resource('data_pemilik', DataPemilikController::class);
-
-
+        
+        
+        
         Route::get('users-create', [RolePerawatKasirController::class, 'create'])->name('admin-user-create');
         Route::post('users-store', [RolePerawatKasirController::class, 'store'])->name('admin-user-store');
         Route::post('sen-dotp', [CodeOtpController::class, 'sendOtpCreateKasirPerawat'])->name('send-otp-create-kasir-perawat');
         Route::post('verify-otp', [CodeOtpController::class, 'verifyOtpKasirPerawat'])->name('verify-otp-kasir-perawat');
         Route::get('laporan-transaksi', [TransaksiController::class, 'LaporanTransaksi'])->name('laporan-transaksi');
         Route::get('laporan-transaksi-cetak-pdf', [TransaksiController::class, 'cetakPDF'])->name('laporan-transaksi-pdf');
-
+        // Laporan Denda
+        Route::get('laporan-denda', [DendaController::class, 'index'])->name('laporan-denda');
+        Route::get('laporan-denda/pdf', [DendaController::class, 'cetakPdf'])->name('laporan-denda-pdf');
+        
         // New data pemilik management routes with verification
         Route::prefix('data-pemilik')->name('data-pemilik.')->middleware(['verified'])->group(function () {
             Route::get('admin-create/{user}', [RolePerawatKasirController::class, 'createdatapemilik'])->name('admin-create-data-pemilik');
@@ -129,10 +135,10 @@ Route::middleware('auth')->group(function () {
     Route::post('/profil/change-email', [ProfilController::class, 'changeEmail'])->name('profil.changeEmail');
     Route::get('/verify-email-change/{token}', [ProfilController::class, 'verifyEmailChange'])->name('email.verify.change');
 
-     // Route untuk mengirim OTP ke nomor telepon user yang sedang login
-     Route::post('/send-otp', [ProfilController::class, 'sendOtpChangePassword'])->name('send-otp-change-password');
-     // Route untuk memvalidasi OTP yang dikirimkan
-     Route::post('/validate-otp-user', [ProfilController::class, 'validateOtpChangePassword'])->name('validate-otp-change-password-user');
+    // Route untuk mengirim OTP ke nomor telepon user yang sedang login
+    Route::post('/send-otp', [ProfilController::class, 'sendOtpChangePassword'])->name('send-otp-change-password');
+    // Route untuk memvalidasi OTP yang dikirimkan
+    Route::post('/validate-otp-user', [ProfilController::class, 'validateOtpChangePassword'])->name('validate-otp-change-password-user');
 
     // User Service Routes
     Route::resource('hewan', HewanController::class);
@@ -215,13 +221,19 @@ Route::middleware('auth')->group(function () {
             Route::get('/profil', [KasirProfilController::class, 'index'])->name('kasir-profil.index');
             Route::post('/profil/update', [KasirProfilController::class, 'update'])->name('kasir-profil.update');
             Route::get('/kasir/verify-otp', [KasirProfilController::class, 'showVerifyOtp'])->name('verify-otp-page');
-Route::get('/kasir/change-password', [KasirProfilController::class, 'showChangePassword'])->name('change-password-page');
+            Route::get('/kasir/change-password', [KasirProfilController::class, 'showChangePassword'])->name('change-password-page');
             Route::post('/profil/change-password', [KasirProfilController::class, 'changePassword'])->name('kasir-profil-change-Password');
             Route::post('/validate-otp', [KasirProfilController::class, 'validateOtpChangePassword'])->name('validate-otp-change-password-kasir');
             Route::post('/send-otp-change-password', [KasirProfilController::class, 'SendOtpChangePassword'])->name('send-otp-change-password-kasir');
             Route::post('/kasir-change-phone', [KasirChangePhoneController::class, 'changePhoneKasir'])->name('kasir-change-phone');
             Route::post('/kasir-validate-otp', [KasirChangePhoneController::class, 'validateOtpKasir'])->name('kasir-validate-otp');
             Route::get('/kasir-validate-otp', [KasirChangePhoneController::class, 'showValidateOtpKasir'])->name('kasir-validate-otp-show');
+            Route::get('/transaksi-denda', [TransaksiDendaController::class, 'index'])->name('transaksi-denda-index');
+            Route::get('/transaksi-denda-create/{id}', [TransaksiDendaController::class, 'create'])->name('transaksi-denda-create');
+            Route::post('/transaksi-denda', [TransaksiDendaController::class, 'store'])->name('transaksi-denda-store');
+            Route::get('/hitung-denda', [TransaksiDendaController::class, 'hitungDenda']);
+            Route::get('/transaksi-denda/{id}', [TransaksiDendaController::class, 'show'])->name('kasir-transaksi-denda-show'); // Route untuk menampilkan detail transaksi denda
+
         });
     });
 });

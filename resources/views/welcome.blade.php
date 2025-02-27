@@ -20,7 +20,8 @@
             border-bottom: 2px solid #0d6efd;
             box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
             padding: 10px 0;
-            height: 80px; /* Mengurangi tinggi navbar */
+            height: 80px;
+            /* Mengurangi tinggi navbar */
 
         }
 
@@ -93,8 +94,8 @@
             </div>
         </div>
     </nav>
-    
-    
+
+
 
     <!-- Carousel -->
     <div id="carouselExampleFade" class="carousel slide carousel-fade">
@@ -119,73 +120,59 @@
         </button>
     </div>
 
- <!-- Pricing -->
-<section class="py-5 bg-light">
-    <div class="container text-center">
-        <h2 class="text-primary">Harga Paket</h2>
-        <div class="row mt-4">
-            <!-- Paket 1 -->
-            <div class="col-md-3 col-sm-6 mb-4">
-                <div class="pricing-card p-4 border rounded shadow-sm">
-                    <img class="img-fluid mb-3" src="assets/images/pethotel.jpg" 
-                        alt="Paket Basic" style="height: 200px; object-fit: cover;">
-                    <h3 class="mb-3">Paket Basic</h3>
-                    <p class="text-muted">Rp50.000/hari</p>
-                    <ul class="list-unstyled mb-4">
-                        <li>Penginapan standar</li>
-                        <li>Makan 2x sehari</li>
-                    </ul>
+    <!-- Fasilitas -->
+    <section class="py-5 bg-light">
+        <div class="container text-center">
+            <h2 class="text-primary">Fasilitas Kami</h2>
+            <div class="row mt-4">
+                <!-- Fasilitas 1: Kamar Nyaman -->
+                <div class="col-md-4 col-sm-6 mb-4">
+                    <div class="fasilitas-card p-4 border rounded shadow-sm">
+                        <img class="img-fluid mb-3" src="assets/images/pt5.jpg" alt="Kamar Nyaman"
+                            style="height: 200px; object-fit: cover;">
+                        <h3 class="mb-3">Kamar Nyaman</h3>
+                        <p class="text-muted">Kamar luas, bersih, dan ber-AC</p>
+                        <ul class="list-unstyled mb-4">
+                            <li>Kasur empuk</li>
+                            <li>Ventilasi udara baik</li>
+                            <li>Pembersihan rutin</li>
+                        </ul>
+                    </div>
                 </div>
-            </div>
 
-            <!-- Paket 2 -->
-            <div class="col-md-3 col-sm-6 mb-4">
-                <div class="pricing-card p-4 border rounded shadow-sm">
-                    <img class="img-fluid mb-3" src="assets/images/pethotel.jpg" 
-                        alt="Paket Premium" style="height: 200px; object-fit: cover;">
-                    <h3 class="mb-3">Paket Premium</h3>
-                    <p class="text-muted">Rp100.000/hari</p>
-                    <ul class="list-unstyled mb-4">
-                        <li>Penginapan nyaman</li>
-                        <li>Makan 3x sehari</li>
-                        <li>Perawatan dasar</li>
-                    </ul>
+                <!-- Fasilitas 2: Taman Bermain -->
+                <div class="col-md-4 col-sm-6 mb-4">
+                    <div class="fasilitas-card p-4 border rounded shadow-sm">
+                        <img class="img-fluid mb-3" src="assets/images/pp.jpg" alt="Taman Bermain"
+                            style="height: 200px; object-fit: cover;">
+                            <h3 class="mb-3">Area Bermain Indoor</h3>
+                            <p class="text-muted">Area bermain Indoor yang luas dan aman</p>
+                        <ul class="list-unstyled mb-4">
+                            <li>Tempat berlari bebas</li>
+                            <li>Mainan interaktif</li>
+                            <li>Keamanan terjamin</li>
+                        </ul>
+                    </div>
                 </div>
-            </div>
 
-            <!-- Paket 3 -->
-            <div class="col-md-3 col-sm-6 mb-4">
-                <div class="pricing-card p-4 border rounded shadow-sm">
-                    <img class="img-fluid mb-3" src="assets/images/pethotel.jpg" 
-                        alt="Paket VIP" style="height: 200px; object-fit: cover;">
-                    <h3 class="mb-3">Paket VIP</h3>
-                    <p class="text-muted">Rp200.000/hari</p>
-                    <ul class="list-unstyled mb-4">
-                        <li>Kamar eksklusif</li>
-                        <li>Makan premium</li>
-                        <li>Grooming harian</li>
-                    </ul>
-                </div>
-            </div>
-
-            <!-- Paket 4 -->
-            <div class="col-md-3 col-sm-6 mb-4">
-                <div class="pricing-card p-4 border rounded shadow-sm">
-                    <img class="img-fluid mb-3" src="assets/images/pethotel.jpg" 
-                        alt="Paket Luxury" style="height: 200px; object-fit: cover;">
-                    <h3 class="mb-3">Paket Luxury</h3>
-                    <p class="text-muted">Rp300.000/hari</p>
-                    <ul class="list-unstyled mb-4">
-                        <li>Kamar VIP</li>
-                        <li>Makan khusus</li>
-                        <li>Grooming & spa</li>
-                        <li>Latihan harian</li>
-                    </ul>
+                <!-- Fasilitas 3: Area Makan -->
+                <div class="col-md-4 col-sm-6 mb-4">
+                    <div class="fasilitas-card p-4 border rounded shadow-sm">
+                        <img class="img-fluid mb-3" src="assets/images/ssss.jpg" alt="Taman Bermain"
+                            style="height: 200px; object-fit: cover;">
+                        <h3 class="mb-3">Area Bermain Outdoor</h3>
+                        <p class="text-muted">Area bermain Outdoor yang luas dan aman</p>
+                        <ul class="list-unstyled mb-4">
+                            <li>Tempat berlari bebas</li>
+                            <li>Mainan interaktif</li>
+                            <li>Keamanan terjamin</li>
+                        </ul>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
-</section>
+    </section>
+
 
 
     <!-- About Us Section -->

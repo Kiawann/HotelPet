@@ -217,12 +217,6 @@ class KasirReservasiHotelController extends Controller
         ])->with('success', 'Status berhasil diperbarui dan notifikasi telah dikirim.');
     }
     
-    
-    
-
-
-
-
  
     public function bulkCancel(Request $request)
     {

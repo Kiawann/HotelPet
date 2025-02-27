@@ -56,4 +56,10 @@ class ReservasiHotel extends Model
     {
         return $this->belongsTo(User::class, 'data_pemilik_id');
     }
+
+    public function transaksiDenda()
+{
+    return $this->hasOne(TransaksiDenda::class, 'reservasi_id');
+}
+
 }
