@@ -144,6 +144,10 @@
        class="{{ request()->routeIs('riwayat.reservasi') ? 'active' : '' }}">
       Riwayat Reservasi
     </a>
+    <a href="{{ route('transaksi-denda-index') }}" 
+       class="{{ request()->routeIs('transaksi-denda-index') ? 'active' : '' }}">
+      Daftar Transaksi Denda
+    </a>
     {{-- <a href="{{ route('kasir-profil.index') }}" 
        class="{{ request()->routeIs('kasir-profil.index') ? 'active' : '' }}">
       Profil

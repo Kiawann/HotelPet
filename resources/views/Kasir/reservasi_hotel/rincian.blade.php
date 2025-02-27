@@ -99,7 +99,7 @@
                                     </td>
                                     <td>
                                         @foreach($rincianGroup as $rincian)
-                                            Rp {{ number_format($rincian->denda, 0, ',', '.') }}<br>
+                                            Rp {{ number_format($rincian->Denda, 0, ',', '.') }}<br>
                                         @endforeach
                                     </td>
                                 </tr>

@@ -19,6 +19,8 @@ class RincianReservasiHotel extends Model
         'room_id',
         'tanggal_checkin',
         'tanggal_checkout',
+        'Denda',
+        'status',
         'SubTotal',
     ];
 

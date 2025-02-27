@@ -135,6 +135,9 @@
       class="{{ request()->routeIs('room.index') ? 'active' : '' }}">Ruangan</a>
     <a href="{{ route('laporan-transaksi') }}"
     class="{{ request()->routeIs('laporan-transaksi') ? 'active' : '' }}">Laporan Transaksi</a>
+     <a href="{{ route('laporan-denda') }}"
+    class="{{ request()->routeIs('laporan-denda') ? 'active' : '' }}">Laporan Denda</a>
+    
   </div>
 
   <div class="content" id="content">

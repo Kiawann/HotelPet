@@ -62,78 +62,92 @@
                                     class="select-reservasi"
                                     {{ in_array($reservasi->status, ['cancel', 'check in', 'check out', 'done', 'di bayar']) ? 'disabled' : '' }}>
                             </td>
-                        </form>
-                            <td>{{ $loop->iteration }}</td>
-                            <td>{{ $reservasi->dataPemilik->nama ?? 'Tidak Diketahui' }}</td>
-                            <td>{{ $reservasi->tanggal_checkin ?? 'Tidak Diketahui' }}</td>
-                            <td>{{ $reservasi->tanggal_checkout ?? 'Tidak Diketahui' }}</td>
-                            <td>{{ $reservasi->status }}</td>
-                            <td>
-                                <div class="btn-group">
-                                    <a href="{{ route('kasir-reservasi-hotel.show', $reservasi->id) }}?status={{ request('status') }}&date_filter={{ request('date_filter') }}"
-                                        class="btn btn-primary btn-sm">
-                                        Rincian
-                                    </a>
+        </form>
+        <td>{{ $loop->iteration }}</td>
+        <td>{{ $reservasi->dataPemilik->nama ?? 'Tidak Diketahui' }}</td>
+        <td>{{ $reservasi->tanggal_checkin ?? 'Tidak Diketahui' }}</td>
+        <td>{{ $reservasi->tanggal_checkout ?? 'Tidak Diketahui' }}</td>
+        <td>{{ $reservasi->status }}</td>
+        <td>
+            <div class="btn-group">
+                <a href="{{ route('kasir-reservasi-hotel.show', $reservasi->id) }}?status={{ request('status') }}&date_filter={{ request('date_filter') }}"
+                    class="btn btn-primary btn-sm">
+                    Rincian
+                </a>
+                @if (
+                    $reservasi->status == 'check out' &&
+                        !$reservasi->transaksiDenda &&
+                        $reservasi->rincianReservasiHotel()->where('Denda', '>', 0)->exists())
+                    <a href="{{ route('transaksi-denda-create', ['id' => $reservasi->id]) }}"
+                        class="btn btn-warning btn-sm">
+                        Pembayaran Denda
+                    </a>
+                @endif
 
-                                    <!-- Tombol Check-In -->
-                                    @if ($reservasi->status == 'di bayar')
-                                        <form action="{{ route('reservasi-hotel-checkin', $reservasi->id) }}"
-                                            method="POST" style="display:inline;">
-                                            @csrf
-                                            @method('PUT')
-                                            <input type="hidden" name="status" value="{{ request('status') }}">
-                                            <input type="hidden" name="date_filter" value="{{ request('date_filter') }}">
-                                            <button type="submit" class="btn btn-success btn-sm">Check In</button>
-                                        </form>
-                                    @endif
-                                    <!-- Tombol Delete -->
-                                    @if (in_array($reservasi->status, ['cancel']))
-                                        <form action="{{ route('kasir-reservasi-hotel.destroy', $reservasi->id) }}"
-                                            method="POST" style="display:inline;"
-                                            onsubmit="return confirm('Apakah Anda yakin ingin menghapus reservasi ini?')">
-                                            @csrf
-                                            @method('DELETE')
-                                            <input type="hidden" name="status" value="{{ request('status') }}">
-                                            <input type="hidden" name="date_filter" value="{{ request('date_filter') }}">
-                                            <button type="submit" class="btn btn-danger btn-sm">Hapus</button>
-                                        </form>
-                                    @endif
 
-                                </div>
 
-                                @if($reservasi->status == 'check out')
-                                <button type="button" class="btn btn-info btn-sm" data-bs-toggle="modal"
-                                    data-bs-target="#infoReservasiModal{{ $reservasi->id }}">
-                                    Pengambilan Hewan
-                                </button>
-                            @endif
-                            </td>
-                        </tr>
-                    @endforeach
-                </tbody>
-            </table>
 
-            <div class="mt-3">
-                <nav aria-label="Page navigation">
-                    <ul class="pagination pagination-sm">
-                        <li class="page-item">
-                            <a class="page-link" href="{{ $reservasiHotels->previousPageUrl() }}" aria-label="Previous">
-                                <span aria-hidden="true">&laquo;</span>
-                            </a>
-                        </li>
-                        @foreach ($reservasiHotels->getUrlRange(1, $reservasiHotels->lastPage()) as $page => $url)
-                            <li class="page-item {{ ($reservasiHotels->currentPage() == $page) ? 'active' : '' }}">
-                                <a class="page-link" href="{{ $url }}">{{ $page }}</a>
-                            </li>
-                        @endforeach
-                        <li class="page-item">
-                            <a class="page-link" href="{{ $reservasiHotels->nextPageUrl() }}" aria-label="Next">
-                                <span aria-hidden="true">&raquo;</span>
-                            </a>
-                        </li>
-                    </ul>
-                </nav>
+
+
+                <!-- Tombol Check-In -->
+                @if ($reservasi->status == 'di bayar')
+                    <form action="{{ route('reservasi-hotel-checkin', $reservasi->id) }}" method="POST"
+                        style="display:inline;">
+                        @csrf
+                        @method('PUT')
+                        <input type="hidden" name="status" value="{{ request('status') }}">
+                        <input type="hidden" name="date_filter" value="{{ request('date_filter') }}">
+                        <button type="submit" class="btn btn-success btn-sm">Check In</button>
+                    </form>
+                @endif
+                <!-- Tombol Delete -->
+                @if (in_array($reservasi->status, ['cancel']))
+                    <form action="{{ route('kasir-reservasi-hotel.destroy', $reservasi->id) }}" method="POST"
+                        style="display:inline;"
+                        onsubmit="return confirm('Apakah Anda yakin ingin menghapus reservasi ini?')">
+                        @csrf
+                        @method('DELETE')
+                        <input type="hidden" name="status" value="{{ request('status') }}">
+                        <input type="hidden" name="date_filter" value="{{ request('date_filter') }}">
+                        <button type="submit" class="btn btn-danger btn-sm">Hapus</button>
+                    </form>
+                @endif
+
             </div>
+
+            @if ($reservasi->status == 'check out')
+                <button type="button" class="btn btn-info btn-sm" data-bs-toggle="modal"
+                    data-bs-target="#infoReservasiModal{{ $reservasi->id }}">
+                    Pengambilan Hewan
+                </button>
+            @endif
+        </td>
+        </tr>
+        @endforeach
+        </tbody>
+        </table>
+
+        <div class="mt-3">
+            <nav aria-label="Page navigation">
+                <ul class="pagination pagination-sm">
+                    <li class="page-item">
+                        <a class="page-link" href="{{ $reservasiHotels->previousPageUrl() }}" aria-label="Previous">
+                            <span aria-hidden="true">&laquo;</span>
+                        </a>
+                    </li>
+                    @foreach ($reservasiHotels->getUrlRange(1, $reservasiHotels->lastPage()) as $page => $url)
+                        <li class="page-item {{ $reservasiHotels->currentPage() == $page ? 'active' : '' }}">
+                            <a class="page-link" href="{{ $url }}">{{ $page }}</a>
+                        </li>
+                    @endforeach
+                    <li class="page-item">
+                        <a class="page-link" href="{{ $reservasiHotels->nextPageUrl() }}" aria-label="Next">
+                            <span aria-hidden="true">&raquo;</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
         </form>
         <!-- Modal Section -->
         @foreach ($reservasiHotels as $reservasi)
@@ -145,7 +159,8 @@
                             <h5 class="modal-title" id="infoReservasiModalLabel{{ $reservasi->id }}">
                                 Data Hewan
                             </h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                aria-label="Close"></button>
                         </div>
                         <div class="modal-body">
                             <form action="{{ route('update-status-rincian-reservasi', $reservasi->id) }}" method="POST">
@@ -158,7 +173,7 @@
                                     <thead>
                                         <tr>
                                             <th>
-                                               Update Status
+                                                Update Status
                                             </th>
                                             <th>Hewan</th>
                                             <th>Room</th>
@@ -234,40 +249,42 @@
             };
 
             // Update "Select All" status when individual checkbox is changed
- document.querySelectorAll('.rincian-checkbox').forEach(checkbox => {
-        checkbox.addEventListener('change', () => {
-            const reservasiId = checkbox.classList[1].split('-')[1];
-            const checkboxes = document.querySelectorAll(`.reservasi-${reservasiId}`);
-            const selectAllCheckbox = document.querySelector(`.select-all[data-reservasi-id="${reservasiId}"]`);
+            document.querySelectorAll('.rincian-checkbox').forEach(checkbox => {
+                checkbox.addEventListener('change', () => {
+                    const reservasiId = checkbox.classList[1].split('-')[1];
+                    const checkboxes = document.querySelectorAll(`.reservasi-${reservasiId}`);
+                    const selectAllCheckbox = document.querySelector(
+                        `.select-all[data-reservasi-id="${reservasiId}"]`);
 
-            const allChecked = Array.from(checkboxes).every(cb => cb.checked || cb.disabled);
-            selectAllCheckbox.checked = allChecked;
-        });
-    });
-
-    document.addEventListener('DOMContentLoaded', function() {
-    // Ambil semua checkbox dengan class rincian-checkbox
-    const checkboxes = document.querySelectorAll('.rincian-checkbox');
-    
-    // Untuk setiap reservasi, ambil tombol update statusnya
-    document.querySelectorAll('.modal').forEach(modal => {
-        const updateButton = modal.querySelector('button[type="submit"]');
-        const modalCheckboxes = modal.querySelectorAll('.rincian-checkbox');
-        
-        // Nonaktifkan tombol saat pertama kali
-        updateButton.disabled = true;
-        
-        // Tambahkan event listener untuk setiap checkbox dalam modal
-        modalCheckboxes.forEach(checkbox => {
-            checkbox.addEventListener('change', function() {
-                // Periksa apakah ada checkbox yang dicentang
-                const isAnyChecked = Array.from(modalCheckboxes).some(cb => cb.checked);
-                
-                // Aktifkan/nonaktifkan tombol berdasarkan status checkbox
-                updateButton.disabled = !isAnyChecked;
+                    const allChecked = Array.from(checkboxes).every(cb => cb.checked || cb.disabled);
+                    selectAllCheckbox.checked = allChecked;
+                });
             });
-        });
-    });
-});
+
+            document.addEventListener('DOMContentLoaded', function() {
+                // Ambil semua checkbox dengan class rincian-checkbox
+                const checkboxes = document.querySelectorAll('.rincian-checkbox');
+
+                // Untuk setiap reservasi, ambil tombol update statusnya
+                document.querySelectorAll('.modal').forEach(modal => {
+                    const updateButton = modal.querySelector('button[type="submit"]');
+                    const modalCheckboxes = modal.querySelectorAll('.rincian-checkbox');
+
+                    // Nonaktifkan tombol saat pertama kali
+                    updateButton.disabled = true;
+
+                    // Tambahkan event listener untuk setiap checkbox dalam modal
+                    modalCheckboxes.forEach(checkbox => {
+                        checkbox.addEventListener('change', function() {
+                            // Periksa apakah ada checkbox yang dicentang
+                            const isAnyChecked = Array.from(modalCheckboxes).some(cb => cb
+                                .checked);
+
+                            // Aktifkan/nonaktifkan tombol berdasarkan status checkbox
+                            updateButton.disabled = !isAnyChecked;
+                        });
+                    });
+                });
+            });
         </script>
     @endsection
