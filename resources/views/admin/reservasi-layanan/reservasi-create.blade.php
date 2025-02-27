@@ -1,13 +1,6 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Form Reservasi Layanan</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
-</head>
-<body>
+@extends('layouts.app')
 
+@section('content')
 <div class="container mt-5">
     <h1>Form Reservasi Layanan</h1>
     <form action="{{ route('reservasi_layanan.store') }}" method="POST" enctype="multipart/form-data">
@@ -106,6 +99,4 @@
         container.appendChild(newForm);
     });
 </script>
-
-</body>
-</html>
+@endsection

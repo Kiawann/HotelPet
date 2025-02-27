@@ -62,6 +62,7 @@
                                     class="select-reservasi"
                                     {{ in_array($reservasi->status, ['cancel', 'check in', 'check out', 'done', 'di bayar']) ? 'disabled' : '' }}>
                             </td>
+                        </form>
                             <td>{{ $loop->iteration }}</td>
                             <td>{{ $reservasi->dataPemilik->nama ?? 'Tidak Diketahui' }}</td>
                             <td>{{ $reservasi->tanggal_checkin ?? 'Tidak Diketahui' }}</td>
@@ -111,6 +112,28 @@
                     @endforeach
                 </tbody>
             </table>
+
+            <div class="mt-3">
+                <nav aria-label="Page navigation">
+                    <ul class="pagination pagination-sm">
+                        <li class="page-item">
+                            <a class="page-link" href="{{ $reservasiHotels->previousPageUrl() }}" aria-label="Previous">
+                                <span aria-hidden="true">&laquo;</span>
+                            </a>
+                        </li>
+                        @foreach ($reservasiHotels->getUrlRange(1, $reservasiHotels->lastPage()) as $page => $url)
+                            <li class="page-item {{ ($reservasiHotels->currentPage() == $page) ? 'active' : '' }}">
+                                <a class="page-link" href="{{ $url }}">{{ $page }}</a>
+                            </li>
+                        @endforeach
+                        <li class="page-item">
+                            <a class="page-link" href="{{ $reservasiHotels->nextPageUrl() }}" aria-label="Next">
+                                <span aria-hidden="true">&raquo;</span>
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
         </form>
         <!-- Modal Section -->
         @foreach ($reservasiHotels as $reservasi)
@@ -221,5 +244,30 @@
             selectAllCheckbox.checked = allChecked;
         });
     });
+
+    document.addEventListener('DOMContentLoaded', function() {
+    // Ambil semua checkbox dengan class rincian-checkbox
+    const checkboxes = document.querySelectorAll('.rincian-checkbox');
+    
+    // Untuk setiap reservasi, ambil tombol update statusnya
+    document.querySelectorAll('.modal').forEach(modal => {
+        const updateButton = modal.querySelector('button[type="submit"]');
+        const modalCheckboxes = modal.querySelectorAll('.rincian-checkbox');
+        
+        // Nonaktifkan tombol saat pertama kali
+        updateButton.disabled = true;
+        
+        // Tambahkan event listener untuk setiap checkbox dalam modal
+        modalCheckboxes.forEach(checkbox => {
+            checkbox.addEventListener('change', function() {
+                // Periksa apakah ada checkbox yang dicentang
+                const isAnyChecked = Array.from(modalCheckboxes).some(cb => cb.checked);
+                
+                // Aktifkan/nonaktifkan tombol berdasarkan status checkbox
+                updateButton.disabled = !isAnyChecked;
+            });
+        });
+    });
+});
         </script>
     @endsection

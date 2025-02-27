@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\CodeOtp;
 use App\Models\User;
 use App\Models\DataPemilik;
 use Illuminate\Http\Request;
@@ -11,6 +12,7 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Storage;
 
 class RolePerawatKasirController extends Controller
 {
@@ -36,24 +38,48 @@ class RolePerawatKasirController extends Controller
      */
     public function store(Request $request)
     {
-        
         $request->validate([
             'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users',
-            'password' => 'required|string|min:8|confirmed',
-            'role' => 'required|in:perawat,kasir', // Hanya perawat & kasir
+            'phone' => 'required|string|max:15|unique:users,phone',
+            'otp' => 'required|string|max:6',
+            'role' => 'required|in:perawat,kasir', // Hanya bisa memilih perawat atau kasir
         ]);
     
+        // Cek apakah OTP valid
+        $otpRecord = CodeOtp::where('phone', $request->phone)
+                            ->where('otp', $request->otp)
+                            ->first();
+    
+        if (!$otpRecord) {
+            return back()->withErrors(['otp' => 'Kode OTP tidak valid atau salah'])->withInput();
+        }
+    
+        // Simpan user jika OTP benar tanpa password
         $user = User::create([
             'name' => $request->name,
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
-            'role' => $request->role, // Ambil role langsung dari request
+            'phone' => $request->phone,
+            'password' => null, // Password tidak diisi
+            'role' => $request->role, // Ambil role dari input
+            'phone_verified_at' => now(),
         ]);
     
+        // Tambahkan data pemilik dengan nama NULL
+        DataPemilik::create([
+            'user_id' => $user->id,
+            'nama' => null, // Nama dibiarkan kosong
+            'phone' => $request->phone, // Sama dengan nomor telepon user
+            'jenis_kelamin' => null, // Bisa diisi nanti oleh user
+            'foto' => null, // Bisa diisi nanti oleh user
+        ]);
+    
+        // Hapus OTP setelah digunakan
+        $otpRecord->delete();
+    
         return redirect()->route('data-pemilik.admin-create-data-pemilik', ['user' => $user->id])
-            ->with('success', 'Akun berhasil dibuat. Silakan lengkapi data pemilik.');
+            ->with('success', 'Akun berhasil dibuat.');
     }
+    
+
     
 
     /**
@@ -69,38 +95,68 @@ class RolePerawatKasirController extends Controller
     /**
      * Store a newly created data pemilik in storage.
      */
-    public function storedatapemilik(Request $request)
+
+
+public function storedatapemilik(Request $request)
 {
     $request->validate([
         'user_id' => 'required|exists:users,id',
         'nama' => 'required|string|max:255',
         'jenis_kelamin' => 'required|in:L,P',
-        'nomor_telp' => 'required|string|max:15',
         'foto' => 'nullable|image|max:2048'
     ]);
 
-    $data = $request->all();
-    
-    if ($request->hasFile('foto')) {
-        $foto = $request->file('foto');
-        $filename = time() . '.' . $foto->getClientOriginalExtension();
-        $foto->storeAs('public/foto_pemilik', $filename);
-        $data['foto'] = $filename;
-    }
-
-    // Menyimpan data pemilik
-    DataPemilik::create($data);
-
-    // Update status email user menjadi terverifikasi otomatis
     $user = User::findOrFail($request->user_id);
-    if (!$user->hasVerifiedEmail()) {
-        $user->markEmailAsVerified();
+
+    // Cek apakah data_pemilik sudah ada
+    $dataPemilik = DataPemilik::where('user_id', $user->id)->first();
+
+    if ($dataPemilik) {
+        // Jika sudah ada, update datanya
+        $fotoPath = $dataPemilik->foto;
+
+        if ($request->hasFile('foto')) {
+            // Hapus foto lama jika ada
+            if ($fotoPath && Storage::disk('public')->exists($fotoPath)) {
+                Storage::disk('public')->delete($fotoPath);
+            }
+
+            // Simpan foto baru
+            $fotoPath = $request->file('foto')->store('profil_fotos', 'public');
+        }
+
+        $dataPemilik->update([
+            'nama' => $request->nama,
+            'jenis_kelamin' => $request->jenis_kelamin,
+            'phone' => $user->phone,
+            'foto' => $fotoPath, // Simpan foto baru atau tetap pakai yang lama
+        ]);
+    } else {
+        // Jika belum ada, buat data baru
+        $fotoPath = null;
+
+        if ($request->hasFile('foto')) {
+            $fotoPath = $request->file('foto')->store('profil_fotos', 'public');
+        }
+
+        DataPemilik::create([
+            'user_id' => $user->id,
+            'nama' => $request->nama,
+            'jenis_kelamin' => $request->jenis_kelamin,
+            'phone' => $user->phone,
+            'foto' => $fotoPath,
+        ]);
     }
 
-    // Redirect dengan pesan sukses
+    if (is_null($user->phone_verified_at)) {
+        $user->update(['phone_verified_at' => now()]);
+    }
+
     return redirect()->route('data_pemilik.index')
         ->with('success', 'Data pemilik berhasil disimpan dan email telah diverifikasi secara otomatis.');
 }
+
+
 
 
 public function verify($id)

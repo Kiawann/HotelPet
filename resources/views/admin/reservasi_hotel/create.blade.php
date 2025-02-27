@@ -45,7 +45,7 @@
                             @if($room->status === 'Tersedia')
                                 <option value="{{ $room->id }}">
                                     {{ $room->nama_ruangan }} - Rp{{ number_format($room->category_hotel->harga, 0, ',', '.') }}
-                                </option>
+                                </option>   
                             @endif
                         @endforeach
                     </select>

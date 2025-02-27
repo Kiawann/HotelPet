@@ -15,4 +15,9 @@ class KategoriHewan extends Model
     protected $fillable = [
         'nama_kategori',
     ];
+
+    public function dataHewans()
+{
+    return $this->hasMany(\App\Models\DataHewan::class, 'kategori_hewan_id');
+}
 }

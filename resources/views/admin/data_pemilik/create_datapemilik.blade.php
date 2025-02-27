@@ -33,14 +33,7 @@
                     @enderror
                 </div>
 
-                <div class="mb-3">
-                    <label for="nomor_telp" class="form-label">Nomor Telepon</label>
-                    <input type="text" class="form-control @error('nomor_telp') is-invalid @enderror" 
-                           id="nomor_telp" name="nomor_telp" value="{{ old('nomor_telp') }}" required>
-                    @error('nomor_telp')
-                        <div class="invalid-feedback">{{ $message }}</div>
-                    @enderror
-                </div>
+                
 
                 <div class="mb-3">
                     <label for="foto" class="form-label">Foto</label>

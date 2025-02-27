@@ -3,8 +3,16 @@
 @section('title', 'Data Hewan')
 
 @section('content')
-    <h1>Data Hewan</h1>
     <a href="{{ route('data_hewan.create') }}" class="btn btn-primary">Tambah Data Hewan</a>
+    <div class="mt-3">
+        <select id="filterKategori" class="form-control w-25 d-inline">
+            <option value="">Semua Kategori</option>
+            @foreach($kategoriHewan as $kategori)
+                <option value="{{ $kategori->id }}">{{ $kategori->nama_kategori }}</option>
+            @endforeach
+        </select>
+        <input type="text" id="searchHewan" class="form-control w-25 d-inline" placeholder="Cari hewan atau pemilik...">
+    </div>
     <table class="table table-bordered mt-3">
         <thead>
             <tr>
@@ -20,14 +28,14 @@
                 <th>Aksi</th>
             </tr>
         </thead>
-        <tbody>
+        <tbody id="tableBody">
             @foreach($dataHewan as $hewan)
-            <tr>
+            <tr data-kategori="{{ $hewan->kategoriHewan->id ?? '' }}">
                 <td>{{ $hewan->nama_hewan }}</td>
                 <td>{{ $hewan->pemilik->nama ?? 'Tidak ada pemilik' }}</td>
                 <td>{{ $hewan->kategoriHewan->nama_kategori ?? 'Tidak ada kategori' }}</td>
                 <td>{{ $hewan->umur }}</td>
-                <td>{{ $hewan->berat_badan}}</td>
+                <td>{{ $hewan->berat_badan }}</td>
                 <td>{{ $hewan->jenis_kelamin }}</td>
                 <td>{{ $hewan->warna }}</td>
                 <td>{{ $hewan->ras_hewan }}</td>
@@ -40,14 +48,62 @@
                 </td>
                 <td>
                     <a href="{{ route('data_hewan.edit', $hewan->id) }}" class="btn btn-warning btn-sm">Edit</a>
-                    <form action="{{ route('data_hewan.destroy', $hewan->id) }}" method="POST" style="display:inline;">
+                    {{-- <form action="{{ route('data_hewan.destroy', $hewan->id) }}" method="POST" style="display:inline;">
                         @csrf
                         @method('DELETE')
                         <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Yakin ingin menghapus?')">Hapus</button>
-                    </form>
+                    </form> --}}
                 </td>
             </tr>
             @endforeach
         </tbody>
     </table>
+
+    <div class="mt-3">
+        <nav aria-label="Page navigation">
+            <ul class="pagination pagination-sm">
+                <li class="page-item">
+                    <a class="page-link" href="{{ $dataHewan->previousPageUrl() }}" aria-label="Previous">
+                        <span aria-hidden="true">&laquo;</span>
+                    </a>
+                </li>
+                @foreach ($dataHewan->getUrlRange(1, $dataHewan->lastPage()) as $page => $url)
+                    <li class="page-item {{ ($dataHewan->currentPage() == $page) ? 'active' : '' }}">
+                        <a class="page-link" href="{{ $url }}">{{ $page }}</a>
+                    </li>
+                @endforeach
+                <li class="page-item">
+                    <a class="page-link" href="{{ $dataHewan->nextPageUrl() }}" aria-label="Next">
+                        <span aria-hidden="true">&raquo;</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const searchInput = document.getElementById('searchHewan');
+            const filterSelect = document.getElementById('filterKategori');
+            const rows = document.querySelectorAll('#tableBody tr');
+
+            function filterTable() {
+                const searchText = searchInput.value.toLowerCase();
+                const selectedKategori = filterSelect.value;
+
+                rows.forEach(row => {
+                    const namaHewan = row.children[0].textContent.toLowerCase();
+                    const pemilik = row.children[1].textContent.toLowerCase();
+                    const kategori = row.getAttribute('data-kategori');
+
+                    const matchesSearch = namaHewan.includes(searchText) || pemilik.includes(searchText);
+                    const matchesKategori = selectedKategori === '' || kategori === selectedKategori;
+
+                    row.style.display = (matchesSearch && matchesKategori) ? '' : 'none';
+                });
+            }
+
+            searchInput.addEventListener('input', filterTable);
+            filterSelect.addEventListener('change', filterTable);
+        });
+    </script>
 @endsection

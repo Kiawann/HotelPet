@@ -15,9 +15,18 @@ class DataPemilik extends Model
         'user_id',
         'nama',
         'jenis_kelamin',
-        'nomor_telp',
+        'phone',
         'foto',
     ];
 
-    
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'user_id', 'id');
+    }
+
+       public function hewan()
+       {
+           return $this->hasMany(DataHewan::class, 'data_pemilik_id');
+       }
+       
 }

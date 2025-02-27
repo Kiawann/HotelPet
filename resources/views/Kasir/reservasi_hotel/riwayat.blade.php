@@ -1,8 +1,8 @@
 @extends('layouts.kasir')
+@section('title', 'Riwayat Reservasi Hotel')
 
 @section('content')
 <div class="container">
-    <h1 class="mb-4">Riwayat Reservasi</h1>
 
     @if($reservasi->isEmpty())
         <div class="alert alert-info">Belum ada riwayat reservasi.</div>
@@ -37,6 +37,28 @@
                 @endforeach
             </tbody>
         </table>
+
+        <div class="mt-3">
+            <nav aria-label="Page navigation">
+                <ul class="pagination pagination-sm">
+                    <li class="page-item">
+                        <a class="page-link" href="{{ $reservasi->previousPageUrl() }}" aria-label="Previous">
+                            <span aria-hidden="true">&laquo;</span>
+                        </a>
+                    </li>
+                    @foreach ($reservasi->getUrlRange(1, $reservasi->lastPage()) as $page => $url)
+                        <li class="page-item {{ $reservasi->currentPage() == $page ? 'active' : '' }}">
+                            <a class="page-link" href="{{ $url }}">{{ $page }}</a>
+                        </li>
+                    @endforeach
+                    <li class="page-item">
+                        <a class="page-link" href="{{ $reservasi->nextPageUrl() }}" aria-label="Next">
+                            <span aria-hidden="true">&raquo;</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
     @endif
 </div>
 @endsection

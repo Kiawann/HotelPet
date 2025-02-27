@@ -11,17 +11,26 @@ class CategoryHotelController extends Controller
     /**
      * Display a listing of the resource.
      */
+    // public function index()
+    // {
+    //     // Ambil semua kategori dengan jumlah ruangan tersedia dan urutkan berdasarkan nama kategori
+    //     $categories = CategoryHotel::withCount(['rooms as jumlah_ruangan' => function ($query) {
+    //         $query->where('status', 'tersedia'); // Hanya hitung ruangan dengan status 'tersedia'
+    //     }])->orderBy('nama_kategori', 'asc')->get(); // Urutkan berdasarkan nama_kategori
+    
+    //     // Kirim data ke view
+    //     return view('admin.kategori_hotel.index', compact('categories'));
+    // }
     public function index()
-{
-    // Ambil semua kategori dengan jumlah ruangan tersedia
-    $categories = CategoryHotel::withCount(['rooms as jumlah_ruangan' => function ($query) {
-        $query->where('status', 'tersedia'); // Hanya hitung ruangan dengan status 'tersedia'
-    }])->get();
-
-    // Kirim data ke view
-    return view('admin.kategori_hotel.index', compact('categories'));
-}
-
+    {
+        // Ambil semua kategori dengan jumlah ruangan tersedia dan urutkan berdasarkan nama kategori
+        $categories = CategoryHotel::withCount(['rooms as jumlah_ruangan' => function ($query) {
+            $query->where('status', 'tersedia'); // Hanya hitung ruangan dengan status 'tersedia'
+        }])->orderBy('nama_kategori', 'asc')->paginate(10); // Ubah get() menjadi paginate(10)
+    
+        // Kirim data ke view
+        return view('admin.kategori_hotel.index', compact('categories'));
+    }
 
     /**
      * Show the form for creating a new resource.
@@ -63,10 +72,12 @@ class CategoryHotelController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(string $id)
+    public function edit($id)
     {
+        $categoryHotel = CategoryHotel::findOrFail($id);
         return view('admin.kategori_hotel.edit', compact('categoryHotel'));
     }
+    
 
     /**
      * Update the specified resource in storage.

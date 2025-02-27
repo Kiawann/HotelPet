@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Validator;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
 
 class AuthController extends Controller
 {
@@ -52,9 +53,11 @@ public function loginStore(Request $request)
 
     // Redirect sesuai role
     if ($user->role === 'admin') {
-        return redirect()->route('admin.dashboard');
+        return redirect()->route('dashboard.index');
     } elseif ($user->role === 'kasir') {
-        return redirect()->route('kasir.dashboard');
+        return redirect()->route('kasir-dashboard');
+    } elseif ($user->role === 'perawat') {
+        return redirect()->route('perawat-dashboard');
     } elseif ($user->role === 'user') {
         return redirect()->intended('/dashboard');
     }
@@ -69,34 +72,44 @@ public function loginStore(Request $request)
         return view('auth.register');
     }
 
-   public function registerstore(Request $request)
-{
-    $request->validate([
-        'name' => 'required|string|max:255',
-        'phone' => 'required|string|max:15',
-        'otp' => 'required|string|max:6',
-        'password' => 'required|string|min:6|confirmed',
-    ]);
-
-    // Cek apakah OTP valid
-    $otpRecord = CodeOtp::where('phone', $request->phone)
-                        ->where('otp', $request->otp)
-                        ->first();
-
-    if (!$otpRecord) {
-        return back()->withErrors(['otp' => 'Kode OTP tidak valid atau salah'])->withInput();
+    public function registerstore(Request $request)
+    {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'phone' => 'required|string|max:15|unique:users,phone',
+            'otp' => 'required|string|max:6',
+            'password' => 'required|string|min:6|confirmed',
+        ]);
+    
+        // Cek apakah OTP valid
+        $otpRecord = CodeOtp::where('phone', $request->phone)
+                            ->where('otp', $request->otp)
+                            ->first();
+    
+        if (!$otpRecord) {
+            return back()->withErrors(['otp' => 'Kode OTP tidak valid atau salah'])->withInput();
+        }
+    
+        // Simpan user jika OTP benar
+        $user = User::create([
+            'name' => $request->name,
+            'phone' => $request->phone,
+            'password' => Hash::make($request->password),
+            'phone_verified_at' => now(),
+        ]);
+    
+        // Tambahkan data pemilik secara otomatis
+        DataPemilik::create([
+            'user_id' => $user->id,
+            'nama' => $request->name, // Sesuai dengan nama user
+            'phone' => $request->phone,
+            'jenis_kelamin' => null, // Bisa diisi nanti oleh user
+            'foto' => null, // Bisa diisi nanti oleh user
+        ]);
+    
+        return redirect()->route('login')->with('status', 'Registrasi berhasil. Silakan login.');
     }
-
-    // Simpan user jika OTP benar
-    $user = User::create([
-        'name' => $request->name,
-        'phone' => $request->phone,
-        'password' => Hash::make($request->password),
-        'phone_verified_at' => now(),
-    ]);
-
-    return redirect()->route('login')->with('status', 'Registrasi berhasil. Silakan login.');
-}
+    
 
 public function verifyOtp(Request $request)
 {
@@ -137,48 +150,104 @@ public function verifyOtp(Request $request)
         return view('auth.forget-password');
     }
 
-    public function sendResetLink(Request $request)
+    // public function sendResetLink(Request $request)
+    // {
+    //     $request->validate([
+    //         'phone_number' => 'required|digits_between:10,15|exists:users,phone_number',
+    //     ]);
+
+    //     $this->sendOtp($request);
+
+    //     return redirect('/reset-password')->with('status', 'Kode OTP telah dikirim ke nomor Anda.');
+    // }
+
+    public function showResetForm(Request $request)
     {
-        $request->validate([
-            'phone_number' => 'required|digits_between:10,15|exists:users,phone_number',
-        ]);
-
-        $this->sendOtp($request);
-
-        return redirect('/reset-password')->with('status', 'Kode OTP telah dikirim ke nomor Anda.');
-    }
-
-    public function showResetPasswordForm()
-    {
-        return view('auth.reset-password');
-    }
-
-    public function resetPassword(Request $request)
-    {
-        $request->validate([
-            'phone_number' => 'required|digits_between:10,15|exists:users,phone_number',
-            'otp' => 'required|digits:6',
-            'password' => 'required|confirmed|min:8',
-        ]);
-
-        $otp = Otps::where('phone_number', $request->phone_number)
-            ->where('otp', $request->otp)
-            ->where('expires_at', '>', Carbon::now())
+        $token = $request->segment(2);
+        $phone = $request->query('phone');
+    
+        $resetToken = DB::table('password_reset_tokens')
+            ->where('phone', $phone)
+            ->where('token', $token)
             ->first();
+    
+        if (!$resetToken) {
+            if (Auth::check()) {
+                $roleRedirects = [
+                    'user' => '/dasboard',
+                    'kasir' => '/cashier',
+                ];
+    
+                $role = Auth::user()->role;
+    
+                if (isset($roleRedirects[$role])) {
+                    return redirect($roleRedirects[$role])->with('error', 'The reset link has expired or is invalid.');
+                }
+            }
+            return redirect()->route('login')->with('error', 'The reset link has expired or is invalid.');
+        }
+    
+        return view('auth.reset-password', compact('token', 'phone'));
+    }
+    
 
-        if (!$otp) {
-            return back()->withErrors(['otp' => 'Kode OTP salah atau telah kedaluwarsa.']);
+    public function reset(Request $request)
+    {
+        $request->validate([
+            'token' => 'required',
+            'phone' => 'required|string|max:12',
+            'password' => 'required|string|min:3|confirmed',
+        ]);
+
+        $token = $request->input('token');
+        $phone = $request->input('phone');
+        $password = $request->input('password');
+
+        $resetToken = DB::table('password_reset_tokens')
+        ->where('phone', $phone)
+        ->where('token', $token)
+        ->first();
+
+        if (!$resetToken) {
+            if (Auth::check()) {
+                $roleRedirects = [
+                    'user' => '/dasboard',
+                    'kasir' => '/cashier',
+                    // 'admin' => '/dashboard',
+                ];
+
+                $role = Auth::user()->role;
+
+                if (isset($roleRedirects[$role])) {
+                    return redirect($roleRedirects[$role])->with('error', 'Request parameters have been tampered with.');
+                }
+            }
+            return redirect()->route('login')->with('error', 'Request parameters have been tampered with.');
         }
 
-        $user = User::where('phone_number', $request->phone_number)->first();
-        if ($user) {
-            $user->password = Hash::make($request->password);
-            $user->save();
+        $user = User::where('phone', $phone)->first();
+
+        $user->update([
+            'password' => Hash::make($password),
+        ]);
+
+        DB::table('password_reset_tokens')->where('phone', $phone)->delete();
+        session()->forget('phone');
+
+        if (Auth::check()) {
+            $roleRedirects = [
+                'user' => '/dasboard',
+                'kasir' => '/cashier',
+                // 'admin' => '/dashboard',
+            ];
+
+            $role = Auth::user()->role;
+
+            if (isset($roleRedirects[$role])) {
+                return redirect($roleRedirects[$role])->with('success', 'Password reset successfully');
+            }
         }
-
-        $otp->delete();
-
-        return redirect('/login')->with('success', 'Password berhasil direset. Silakan login.');
+        return redirect()->route('login')->with('success', 'Password reset successfully');
     }
 
    

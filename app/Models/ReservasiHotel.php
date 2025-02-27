@@ -9,13 +9,13 @@ class ReservasiHotel extends Model
 {
     use HasFactory;
 
-    // Nama tabel (opsional jika nama model tidak sama dengan tabel)
     protected $table = 'reservasi_hotel';
 
-    // Kolom yang dapat diisi melalui mass assignment
     protected $fillable = [
-        'data_pemilik_id', // Foreign key
+        'data_pemilik_id',
         'status',
+        'tanggal_checkin',
+        'tanggal_checkout',
         'Total',
     ];
 
@@ -29,23 +29,31 @@ class ReservasiHotel extends Model
 
     public function rincianReservasiHotel()
     {
-        return $this->hasMany(RincianReservasiHotel::class);
+        return $this->hasMany(RincianReservasiHotel::class, 'reservasi_hotel_id', 'id');
     }
-
     public function laporanHewan()
     {
         return $this->hasMany(LaporanHewan::class, 'reservasi_hotel_id');
     }
 
-public function rooms()
-{
-    return $this->hasManyThrough(Room::class, RincianReservasiHotel::class, 'reservasi_hotel_id', 'id', 'id', 'room_id');
-}
+    public function rooms()
+    {
+        return $this->hasManyThrough(Room::class, RincianReservasiHotel::class, 'reservasi_hotel_id', 'id', 'id', 'room_id');
+    }
 
- 
-     // Relasi dengan rincian data hewan
-     public function dataHewans()
-{
-    return $this->hasManyThrough(DataHewan::class, RincianReservasiHotel::class, 'reservasi_hotel_id', 'id', 'id', 'data_hewan_id');
-}
+
+    // Relasi dengan rincian data hewan
+    public function dataHewans()
+    {
+        return $this->hasManyThrough(DataHewan::class, RincianReservasiHotel::class, 'reservasi_hotel_id', 'id', 'id', 'data_hewan_id');
+    }
+
+    public function transaksi()
+    {
+        return $this->hasOne(Transaksi::class, 'reservasi_hotel_id','id');
+    }
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'data_pemilik_id');
+    }
 }

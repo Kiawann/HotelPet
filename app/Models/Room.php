@@ -9,7 +9,7 @@ class Room extends Model
 {
     use HasFactory;
 
-    protected $table = 'room'; // Pastikan ini sesuai dengan tabel yang ada di database
+    protected $table = 'room';
 
     protected $fillable = [
         'category_hotel_id',
@@ -17,14 +17,18 @@ class Room extends Model
         'status',
     ];
 
-    // Relasi dengan CategoryHotel
     public function category_hotel()
     {
-        return $this->belongsTo(CategoryHotel::class, 'category_hotel_id');
+        return $this->belongsTo(CategoryHotel::class, 'category_hotel_id', 'id');
     }
 
     public function laporanHewan()
     {
         return $this->hasMany(LaporanHewan::class, 'room_id');
+    }
+
+    public function rincianReservasiHotel()
+    {
+        return $this->hasMany(RincianReservasiHotel::class);
     }
 }

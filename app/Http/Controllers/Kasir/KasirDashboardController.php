@@ -35,6 +35,7 @@ class KasirDashboardController extends Controller
     
         return view('kasir.dashboard', compact('todayReservations', 'todayCheckins', 'todayDibayar', 'todayCheckouts','todayCancel'));
     }
+    
 
     /**
      * Show the form for creating a new resource.

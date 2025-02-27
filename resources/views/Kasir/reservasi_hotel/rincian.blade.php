@@ -106,20 +106,19 @@
                             @endforeach
                         </tbody>
                     </table>
-
                     <div class="text-right">
-                        @if($reservasiHotel->transaksi) <!-- Cek apakah sudah ada transaksi -->
+                        @if($reservasiHotel->transaksi && $reservasiHotel->transaksi->status_pembayaran !== 'Transfer') <!-- Cek jika transaksi ada dan status bukan 'Transfer' -->
                             <a href="{{ route('transaksi-struk', ['reservasi_hotel_id' => $reservasiHotel->id]) }}" 
                                class="btn btn-info btn-sm d-inline-flex align-items-center">
                                 <i class="fas fa-receipt me-2"></i> Lihat Struk
                             </a>
-                        @else
+                        @elseif(!$reservasiHotel->transaksi) <!-- Jika transaksi belum ada -->
                             <a href="{{ route('transaksi-create', $reservasiHotel->id) }}?status={{ request('status') }}&date_filter={{ request('date_filter') }}" 
                                class="btn btn-primary btn-sm d-inline-flex align-items-center">
                                 <i class="fas fa-credit-card me-2"></i> Pembayaran
                             </a>
                         @endif
-                    </div>
+                    </div>
                     
                 </form>
             </div>
