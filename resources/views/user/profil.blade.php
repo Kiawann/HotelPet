@@ -81,6 +81,7 @@
       <h2>{{ Auth::user()->name }}</h2>
       <p class="text-muted">{{ Auth::user()->email }}</p>
     </div>
+    
   </section>
 
   <!-- Profile Card Section -->
