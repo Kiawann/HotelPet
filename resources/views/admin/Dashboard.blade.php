@@ -6,8 +6,8 @@
 </head>
 
 @section('content')
-    <div class="container mt-5">
-        <div class="row row-cols-1 row-cols-md-4 g-3 mt-4">
+<div class="container mt-5" style="overflow-y: auto; max-height: 80vh;">
+    <div class="row row-cols-1 row-cols-md-4 g-3 mt-4">
             @php
                 $totalUsers = \App\Models\User::where('role', 'user')->count();
                 $totalAdmins = \App\Models\User::where('role', 'admin')->count();

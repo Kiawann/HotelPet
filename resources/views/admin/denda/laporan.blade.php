@@ -15,21 +15,23 @@
 
     <a href="{{ route('laporan-denda-pdf', ['tahun' => request('tahun', date('Y'))]) }}" class="btn btn-primary mb-3">Cetak PDF</a>
 
-    <table class="table table-bordered">
-        <thead>
-            <tr>
-                <th>Bulan</th>
-                <th>Total Denda</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach ($totals as $month => $total_denda)
+    <div style="overflow-y: auto; max-height: 60vh; border: 1px solid #ddd; padding: 10px;">
+        <table class="table table-bordered">
+            <thead class="thead-dark">
                 <tr>
-                    <td>{{ date('F', mktime(0, 0, 0, $month, 1)) }}</td>
-                    <td>{{ number_format($total_denda, 2, ',', '.') }}</td>
+                    <th>Bulan</th>
+                    <th>Total Denda</th>
                 </tr>
-            @endforeach
-        </tbody>
-    </table>
+            </thead>
+            <tbody>
+                @foreach ($totals as $month => $total_denda)
+                    <tr>
+                        <td>{{ date('F', mktime(0, 0, 0, $month, 1)) }}</td>
+                        <td>{{ number_format($total_denda, 2, ',', '.') }}</td>
+                    </tr>
+                @endforeach
+            </tbody>
+        </table>
+    </div>
 </div>
 @endsection
