@@ -77,7 +77,7 @@
   <!-- Profil Section -->
   <section class="profile-header text-center"><br><br>
     <div class="container">
-      <img src="{{ asset('storage/' . Auth::user()->dataPemilik->foto) }}" alt="User Avatar" class="img-fluid profile-picture">
+      <img src="{{ Storage::url(Auth::user()->dataPemilik->foto)  }}" alt="User Avatar" class="img-fluid profile-picture">
       <h2>{{ Auth::user()->name }}</h2>
       <p class="text-muted">{{ Auth::user()->email }}</p>
     </div>
